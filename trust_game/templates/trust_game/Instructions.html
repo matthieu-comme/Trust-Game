@@ -1,0 +1,17 @@
+{% extends "global/Page.html" %} {% block content %}
+
+<h2>Instructions</h2>
+
+<p>Ce jeu se joue à deux personnes : un joueur A et un joueur B.</p>
+
+<ul>
+  <li>Le joueur A reçoit 10 jetons.</li>
+  <li>Il peut en envoyer une partie ou la totalité au joueur B.</li>
+  <li>Les jetons envoyés sont triplés lorsqu’ils arrivent chez le joueur B.</li>
+  <li>Le joueur B décide ensuite combien il souhaite renvoyer au joueur A.</li>
+  <li>Les jetons renvoyés par B ne sont pas multipliés</li>
+</ul>
+
+<p>Commençons par un petit exemple pour vérifier votre compréhension.</p>
+
+{{ next_button }} {% endblock %}

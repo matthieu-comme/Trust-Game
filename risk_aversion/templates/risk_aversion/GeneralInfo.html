@@ -1,0 +1,26 @@
+{% block content %}
+<h2>Informations générales</h2>
+<p>
+  Vous allez maintenant participer à <strong>{{ etape }}</strong> de
+  l’expérimentation.
+</p>
+
+<p>Cette étape comprend :</p>
+<ul>
+  <li>
+    ✅ une tâche rémunérée qui vous permettra de gagner
+    <strong>{{ C.ENDOWMENT}} </strong> ;
+  </li>
+  <li>🎲 une série de jeux de décisions où le hasard joue un rôle.</li>
+</ul>
+
+<div class="alert alert-info">
+  💡 À la fin de cette série de jeux,
+  <strong>une seule de vos décisions</strong> est tirée au sort pour déterminer
+  votre gain ou perte final.<br />
+  Cela signifie que chaque décision compte : il est donc important de répondre à
+  chaque décision avec attention.
+</div>
+
+<button class="btn btn-primary">Continuer</button>
+{% endblock %}

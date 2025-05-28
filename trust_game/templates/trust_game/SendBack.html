@@ -1,0 +1,113 @@
+{{ block title }} Joueur {{ player.id_in_group }}: Renvoi des jetons {{ endblock
+}} {{ block content }}
+<div class="card mb-3">
+  <div class="card-body">
+    <h4>Instructions</h4>
+    <p>Vous êtes le <strong>Joueur B</strong>.</p>
+    <p>
+      Le Joueur A vous a envoyé {{ group.amount_sent }} jetons. Ce montant a été
+      <strong>triplé</strong> et vous recevez donc {{ tripled_amount }} jetons.
+    </p>
+    <p>
+      Vous pouvez maintenant décider combien de jetons renvoyer au Joueur A.
+    </p>
+  </div>
+</div>
+
+<!-- Section de chat -->
+<div class="card mb-3">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0">Discussion avec le Joueur A</h5>
+  </div>
+  <div class="card-body">
+    <div
+      id="chat-box"
+      style="
+        height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+      "
+    >
+      <!-- Les messages s'afficheront ici -->
+      <div id="chat-history">{{ player.chat_history|safe }}</div>
+    </div>
+    <div class="input-group">
+      <input
+        type="text"
+        id="chat-input"
+        class="form-control"
+        placeholder="Écrivez votre message..."
+      />
+      <div class="input-group-append">
+        <button id="send-button" class="btn btn-primary">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Formulaire pour renvoyer des jetons -->
+<div class="card">
+  <div class="card-header bg-success text-white">
+    <h5 class="mb-0">Votre décision</h5>
+  </div>
+  <div class="card-body">
+    <p>
+      Combien de jetons souhaitez-vous renvoyer au Joueur A ?
+      <br />
+      (Vous avez reçu {{ tripled_amount }} jetons)
+    </p>
+    {{ formfield 'amount_sent_back' }} {{ next_button }}
+  </div>
+</div>
+
+{{ endblock }} {{ block scripts }}
+<script>
+  // Configuration du chat en temps réel
+  document.addEventListener("DOMContentLoaded", function () {
+    const chatBox = document.getElementById("chat-box");
+    const chatInput = document.getElementById("chat-input");
+    const sendButton = document.getElementById("send-button");
+    const chatHistory = document.getElementById("chat-history");
+
+    // Faire défiler vers le bas pour voir les derniers messages
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Configurer la validation du champ de saisie
+    const amountField = document.getElementById("id_amount_sent_back");
+    amountField.setAttribute("min", "0");
+    amountField.setAttribute("max", "{{ tripled_amount }}");
+    amountField.setAttribute("type", "number");
+
+    // Fonction pour envoyer un message
+    function sendMessage() {
+      const message = chatInput.value.trim();
+      if (message) {
+        liveSend({ message: message });
+        chatInput.value = "";
+      }
+    }
+
+    // Événements pour envoyer un message
+    sendButton.addEventListener("click", sendMessage);
+    chatInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    // Recevoir les messages
+    liveRecv(function (data) {
+      if (data.new_message) {
+        chatHistory.innerHTML += data.new_message;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+      if (data.full_chat) {
+        chatHistory.innerHTML = data.full_chat;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    });
+  });
+</script>
+{{ endblock }}

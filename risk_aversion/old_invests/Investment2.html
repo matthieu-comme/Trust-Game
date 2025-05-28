@@ -1,0 +1,48 @@
+{{ block title }}
+    Décision 2 - Pertes potentielles
+{{ endblock }}
+
+{{ block content }}
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title">Décision 2 : Pertes potentielles</h3>
+            
+            <p>
+                Veuillez choisir une des options de loterie suivantes :
+            </p>
+            
+            <div class="alert alert-warning">
+                <p><strong>Attention :</strong> Cette décision concerne des pertes potentielles qui seront déduites de votre dotation initiale.</p>
+            </div>
+            
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Option</th>
+                        <th>Description</th>
+                        <th>Votre choix</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for option, lottery in lotteries.items %}
+                    <tr>
+                        <td><strong>{{ option }}</strong></td>
+                        <td>{{ lottery.description }}</td>
+                        <td class="text-center">
+                            <input type="radio" name="decision_2" value="{{ option }}" required />
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="form-group">
+                {{ formfields }}
+            </div>
+            
+            <div class="text-center mt-4">
+                {{ next_button }}
+            </div>
+        </div>
+    </div>
+{{ endblock }}

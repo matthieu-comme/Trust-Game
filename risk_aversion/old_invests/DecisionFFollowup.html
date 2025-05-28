@@ -1,0 +1,71 @@
+{% extends "global/Page.html" %} {% block title %} Décision supplémentaire –
+Option F sélectionnée {% endblock %} {% block content %}
+
+<h3>Décision supplémentaire</h3>
+<p>
+  Vous avez sélectionné l’<strong>option F</strong> à la décision n°1, ce qui
+  implique un investissement total de vos 10 jetons dans une option risquée.
+</p>
+<p>
+  Nous vous proposons maintenant une décision supplémentaire qui pourra être
+  tirée au sort pour déterminer votre rémunération finale.
+</p>
+<p>Veuillez choisir <strong>une</strong> des options suivantes :</p>
+<form method="post">
+  <table class="table table-bordered mt-4">
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Description</th>
+        <th>Votre choix</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>A</strong></td>
+        <td>Gagner 10 jetons</td>
+        <td>
+          <input type="radio" name="decision_f_followup" value="A" required />
+        </td>
+      </tr>
+      <tr>
+        <td><strong>B</strong></td>
+        <td>
+          1 chance sur 2 de gagner 5 jetons<br />1 chance sur 2 de gagner 15
+          jetons
+        </td>
+        <td>
+          <input type="radio" name="decision_f_followup" value="B" required />
+        </td>
+      </tr>
+      <tr>
+        <td><strong>C</strong></td>
+        <td>
+          1 chance sur 3 de gagner 5 jetons<br />1 chance sur 3 de gagner 10
+          jetons<br />1 chance sur 3 de gagner 15 jetons
+        </td>
+        <td>
+          <input type="radio" name="decision_f_followup" value="C" required />
+        </td>
+      </tr>
+      <tr>
+        <td><strong>D</strong></td>
+        <td>
+          1 chance sur 2 de gagner 0 jeton<br />1 chance sur 2 de gagner 20
+          jetons
+        </td>
+        <td>
+          <input type="radio" name="decision_f_followup" value="D" required />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="form-check mt-3">
+    <input type="checkbox" required />
+    <label class="form-check-label"
+      >Je confirme avoir compris et validé mon choix</label
+    >
+  </div>
+  <div class="text-center mt-4">{{ next_button }}</div>
+</form>
+{% endblock %}

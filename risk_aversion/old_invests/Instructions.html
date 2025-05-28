@@ -1,0 +1,69 @@
+{{ block title }}Instructions{{ endblock }} {{ block content }}
+<div class="container mt-4" style="max-width: 800px">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h3>Bienvenue dans le jeu d'investissement</h3>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info">
+        <h5>📋 <strong>Instructions générales</strong></h5>
+        <p>
+          Vous allez participer à un jeu d'investissement composé de
+          <strong>4 décisions</strong>.
+        </p>
+        <p>
+          Pour chaque décision, vous devrez choisir comment investir
+          <strong>10 jetons</strong> dans un jeu risqué.
+        </p>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+              <strong>🎯 Votre objectif</strong>
+            </div>
+            <div class="card-body">
+              <p>
+                Maximiser vos gains en choisissant judicieusement vos
+                investissements.
+              </p>
+              <p>Vous commencez avec <strong>30 jetons</strong> au total.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-header bg-success text-white">
+              <strong>💰 Comment gagner</strong>
+            </div>
+            <div class="card-body">
+              <p>
+                À la fin, <strong>une de vos 4 décisions</strong> sera choisie
+                au hasard.
+              </p>
+              <p>
+                Votre gain dépendra du résultat de cette décision sélectionnée.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning mt-4">
+        <h6><strong>⚠️ Important à retenir :</strong></h6>
+        <ul class="mb-0">
+          <li>
+            Chaque décision peut être celle qui compte pour vos gains finaux
+          </li>
+          <li>Réfléchissez bien à chaque choix</li>
+          <li>Il n'y a pas de "bonne" ou "mauvaise" réponse</li>
+          <li>Vos préférences personnelles comptent</li>
+        </ul>
+      </div>
+
+      <div class="text-center mt-4">{{ next_button }}</div>
+    </div>
+  </div>
+</div>
+{{ endblock }}

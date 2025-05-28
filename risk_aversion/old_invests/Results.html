@@ -1,0 +1,68 @@
+{{ block title }}
+    Résultats Finaux
+{{ endblock }}
+
+{{ block content }}
+    <div class="card bg-light my-4">
+        <div class="card-body">
+            <h2 class="card-title">Résultats de l'Expérience</h2>
+            
+            <div class="alert alert-primary">
+                <h4>Décision {{ chosen_decision }} - Option {{ chosen_lottery }}</h4>
+                <div class="my-2 p-2 bg-white rounded">
+                    {{ lottery_desc|linebreaks }}
+                </div>
+            </div>
+
+            <div class="card my-3">
+                <div class="card-header bg-info text-white">
+                    Résultat du Tirage Aléatoire : {{ lottery_result_formatted }}
+                </div>
+                <div class="card-body">
+                    {% if won_high %}
+                    <div class="alert alert-success">
+                        <h5 class="mb-0">
+                            ≤ {{ threshold_formatted }} → 
+                            Vous obtenez : <strong>{{ high_outcome }}</strong>
+                        </h5>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">
+                        <h5 class="mb-0">
+                            > {{ threshold_formatted }} → 
+                            Vous obtenez : <strong>{{ low_outcome }}</strong>
+                        </h5>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Calcul Final</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span>Dotation initiale :</span>
+                        <strong>{{ initial_endowment }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Résultat de la loterie :</span>
+                        <strong>{{ lottery_outcome }}</strong>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between h4">
+                        <span>Total :</span>
+                        <strong class="text-success">{{ payoff }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <button class="btn btn-primary btn-lg">
+                    Terminer l'Expérience
+                </button>
+            </div>
+        </div>
+    </div>
+{{ endblock }}

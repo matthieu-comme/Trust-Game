@@ -1,0 +1,111 @@
+{{ block title }}Information sur le jeu d'investissement{{ endblock }} {{ block
+content }}
+<div class="container mt-4" style="max-width: 800px">
+  <div class="card">
+    <div class="card-header bg-info text-white">
+      <h4>🔍 Comment fonctionne le jeu risqué ?</h4>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-light border">
+        <p>
+          Un tirage au sort est effectué dans une urne contenant
+          <strong>12 boules</strong> :
+        </p>
+        <div class="text-center my-3">
+          <span class="badge badge-warning p-2 mr-3" style="font-size: 1.1em"
+            >🟡 6 boules JAUNES</span
+          >
+          <span class="badge badge-secondary p-2" style="font-size: 1.1em"
+            >🟣 6 boules VIOLETTES</span
+          >
+        </div>
+
+        <p>
+          Avec autant de boules 🟡 que 🟣, vous avez
+          <strong>1 chance sur 2</strong> de tirer chaque boule :
+        </p>
+        <ul>
+          <li>
+            <strong>🟡 tirage JAUNE →</strong>
+            <span class="text-success font-weight-bold"
+              >vous gagnez 3 fois les jetons investis</span
+            >
+          </li>
+          <li>
+            <strong>🟣 tirage VIOLET →</strong>
+            <span class="text-danger font-weight-bold"
+              >vous perdez les jetons investis</span
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="alert alert-secondary">
+        <h6>💡 <strong>Exemple détaillé :</strong></h6>
+        <p>
+          Supposons que vous investissez <strong>4 jetons</strong> (et en gardez
+          donc 6).
+        </p>
+
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="border p-3 bg-light-yellow">
+              <h6 class="text-success">🟡 <strong>Si boule JAUNE :</strong></h6>
+              <p class="mb-1">
+                • Jetons gagnés : 4 × 3 = <strong>12 jetons</strong>
+              </p>
+              <p class="mb-1">• Jetons gardés : <strong>6 jetons</strong></p>
+              <p class="mb-0 font-weight-bold text-success">
+                Total : 12 + 6 = <strong>18 jetons</strong>
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="border p-3 bg-light-purple">
+              <h6 class="text-danger">
+                🟣 <strong>Si boule VIOLETTE :</strong>
+              </h6>
+              <p class="mb-1">• Jetons perdus : <strong>4 jetons</strong></p>
+              <p class="mb-1">• Jetons gardés : <strong>6 jetons</strong></p>
+              <p class="mb-0 font-weight-bold text-warning">
+                Total : 0 + 6 = <strong>6 jetons</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <h6><strong>⚠️ Rappel important :</strong></h6>
+        <p class="mb-0">
+          Chaque décision peut être sélectionnée au hasard pour déterminer votre
+          gain final. Prenez chaque choix au sérieux !
+        </p>
+      </div>
+
+      <div class="text-center mt-4">
+        <p class="lead">
+          Êtes-vous prêt à commencer les décisions d'investissement ?
+        </p>
+        {{ next_button }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bg-light-yellow {
+    background-color: #fff9c4 !important;
+  }
+  .bg-light-purple {
+    background-color: #f3e5f5 !important;
+  }
+  .badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  .badge-secondary {
+    background-color: #6c757d;
+  }
+</style>
+{{ endblock }}
