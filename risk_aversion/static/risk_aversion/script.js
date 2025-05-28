@@ -1,27 +1,4 @@
-{% load static %}
-
-{% block title %} Investissez vos jetons – Décision 1 {% endblock %} 
-{% block content %}
-
-<p><strong>Combien souhaitez-vous investir ?</strong></p>
-
-    {% formfields %}  
-  
-  <div id="preview">
-    <p> -> je garde <span id="kept">nb_jetons</span> jetons</p>
-    <strong>Vos jetons après tirage :</strong>
-    <ul>
-      <li>🟡 Boule JAUNE : <span id="gains_if_yellow">jaune</span></li>
-      <li>🟣 Boule VIOLETTE : <span id="gains_if_purple">violette</span></li>
-    </ul>
-    
-    
-  </div>
- 
-  {% next_button %}
-
-  <script>
-    const selectInput = document.querySelector('select[name=inv1]');
+const selectInput = document.querySelector('select[name=inv1]');
 const max_investment = parseFloat("{{C.MAX_INVESTMENT }}");
 const kept = document.getElementById('kept');
 const gains_if_yellow = document.getElementById('gains_if_yellow');
@@ -38,8 +15,3 @@ function updateMessage() {
 
 selectInput.addEventListener('change', updateMessage);
 document.addEventListener('DOMContentLoaded', updateMessage);
-
-  </script>
-{% endblock %}
-
-  

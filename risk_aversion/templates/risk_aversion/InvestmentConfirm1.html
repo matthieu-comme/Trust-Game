@@ -1,25 +1,9 @@
+{% extends "risk_aversion/InvestmentConfirmBase.html" %}
+
+{% block title %} Investissez vos jetons – Décision 1 {% endblock %} 
+
 {% block content %}
-<h2>✅ Votre décision a bien été enregistrée</h2>
 
-<p>
-  <strong>Jetons investis :</strong> {{ invested }}<br />
-  <strong>Jetons gardés :</strong> {{ kept }}
-</p>
-
-<p><strong>Gains possibles selon le tirage :</strong></p>
-<ul>
-  <li>
-    🟡 Boule JAUNE → {{ kept }} + 3 × {{ invested }} =
-    <strong>{{ gain_if_yellow }}</strong> jetons
-  </li>
-  <li>🟣 Boule VIOLETTE → <strong>{{ gain_if_purple }}</strong> jetons</li>
-</ul>
-
-<p>
-  ⚠️ Cette décision peut être tirée au sort à la fin pour déterminer votre gain
-  final.
-</p>
-<p>Pour l’instant, vous avez toujours 30 jetons.</p>
-
-<button class="btn btn-primary">Continuer</button>
+  {{ block.super }}
+  
 {% endblock %}

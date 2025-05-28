@@ -35,12 +35,11 @@ class Player(BasePlayer):
     target_digit = models.IntegerField(initial=0)  # Added initial value to avoid None
     pi_count = models.IntegerField(label="Combien de fois ce chiffre apparaît-il ?")
     task_success = models.BooleanField(initial=False)
-    inv_label = "Je décide d'investir :"
-    inv1 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label=inv_label)
-    inv2 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label=inv_label)
-    inv3 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label=inv_label)
-    inv4 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label=inv_label)
-    full_invests = [models.BooleanField(initial=False) for i in range(0,4)]
+
+    inv1 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], initial=0, label="Je décide d'investir :")
+    inv2 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label="Je décide d'investir :")
+    inv3 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label="Je décide d'investir :")
+    inv4 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label="Je décide d'investir :")
 
 class CountDigitTask(Page):
     form_model = "player"
@@ -90,28 +89,10 @@ class InvestmentDecision1(Page):
     form_model = "player"
     form_fields = ["inv1"]
 
-    def vars_for_template(player):
-        return {
-            "max_investment": 10,
-        }
-
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        player.full_investment_1 = player.inv1 == C.MAX_INVESTMENT
-
 
 class InvestmentConfirm1(Page):
-    def vars_for_template(player):
-        invested = player.inv1
-        kept = 10 - invested
-        return {
-            "invested": invested,
-            "kept": kept,
-            "gain_if_yellow": kept + 3 * invested,
-            "gain_if_purple": kept,
-            "full_investment": invested == 10,
-        }
-
+    def vars_for_template(player: Player):
+        return {'payoff': player.payoff}
         # DÉCISION 2
 
 class InvestmentIntro2(Page):
@@ -189,7 +170,7 @@ class InvestmentConfirm4(Page):
         }
 
 page_sequence = [
-    GeneralInfo,
+    #GeneralInfo,
     CountDigitTask,
     InvestmentIntroduction,
     InvestmentIntro1,
