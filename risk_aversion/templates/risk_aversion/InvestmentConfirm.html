@@ -1,0 +1,12 @@
+{% block title %} Investissez vos jetons - Décision {{i_decision}} {% endblock %}
+
+{% block content %}
+<h2>✅ Votre décision {{ i_decision }} a bien été enregistrée</h2>
+
+<p>⚠️ Elle pourra être tirée au sort à la fin de cette étape pour déterminer vos gains.</p>
+<p><strong>À ce stade :</strong><br>
+  Votre décision n’a pas encore été tirée au sort. Vous avez toujours <strong>{{ player.payoff }}</strong>.
+</p>
+
+{{ next_button }}
+{% endblock %}

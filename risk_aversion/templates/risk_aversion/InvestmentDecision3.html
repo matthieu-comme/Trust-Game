@@ -2,8 +2,20 @@
 {% block content %}
 
 <p><strong>Combien souhaitez-vous investir ?</strong></p>
-<form method="post">
-  {% formfields %}
-  <button class="btn btn-success">Valider ma décision</button>
-</form>
+
+{% formfields %}
+
+<div id="preview">
+  <p>-> donc je ne mise pas les <strong id="kept"></strong> autres jetons qui sont définitivement perdus</p>
+  <strong>Vos jetons après tirage :</strong>
+  <ul>
+    <li>🟡 Boule JAUNE : <span id="gains_if_yellow"></span></li>
+    <li>🟣 Boule VIOLETTE : <span id="gains_if_purple"></span></li>
+  </ul>
+</div>
+
+{% next_button %} 
+
+{{ include_sibling 'scripts.html'}} 
+
 {% endblock %}

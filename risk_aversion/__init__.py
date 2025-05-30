@@ -21,7 +21,6 @@ class C(BaseConstants):
     )
 
 
-
 class Subsession(BaseSubsession):
     pass
 
@@ -32,14 +31,44 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     # Tâche de comptage
-    target_digit = models.IntegerField(initial=0)  # Added initial value to avoid None
+    target_digit = models.IntegerField(initial=0)
     pi_count = models.IntegerField(label="Combien de fois ce chiffre apparaît-il ?")
-    task_success = models.BooleanField(initial=False)
 
-    inv1 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], initial=0, label="Je décide d'investir :")
-    inv2 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label="Je décide d'investir :")
-    inv3 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label="Je décide d'investir :")
-    inv4 = models.IntegerField(choices=[(i, str(i)) for i in range(0, 11)], label="Je décide d'investir :")
+    i_decision = models.IntegerField(initial=1)
+
+    inv1 = models.IntegerField(
+        choices=[(i, str(i)) for i in range(0, 11)],
+        initial=0,
+        label="Je décide d'investir :",
+    )
+    inv2 = models.IntegerField(
+        choices=[(i, str(i)) for i in range(0, 11)],
+        initial=0,
+        label="Je décide d'investir :",
+    )
+    inv3 = models.IntegerField(
+        choices=[(i, str(i)) for i in range(0, 11)],
+        initial=0,
+        label="Je décide d'investir :",
+    )
+    inv4 = models.IntegerField(
+        choices=[(i, str(i)) for i in range(0, 11)],
+        initial=0,
+        label="Je décide d'investir :",
+    )
+    inv5 = models.StringField(
+        choices=["A", "B", "C", "D"], label="Je choisis le tirage :"
+    )
+    inv6 = models.StringField(
+        choices=["A", "B", "C", "D"], label="Je choisis le tirage :"
+    )
+    inv7 = models.StringField(
+        choices=["A", "B", "C", "D"], label="Je choisis le tirage :"
+    )
+    inv8 = models.StringField(
+        choices=["A", "B", "C", "D"], label="Je choisis le tirage :"
+    )
+
 
 class CountDigitTask(Page):
     form_model = "player"
@@ -50,8 +79,6 @@ class CountDigitTask(Page):
         correct_count = C.PI_DIGITS.count(str(player.target_digit))
         if values["pi_count"] != correct_count:
             return f"Incorrect. Réessayez."
-        else:
-            player.task_success = True
 
     def vars_for_template(player):
         return dict(
@@ -62,127 +89,194 @@ class CountDigitTask(Page):
     def before_next_page(player, timeout_happened):
         player.payoff = C.ENDOWMENT
 
-    #def is_displayed(player):
-    #    return not player.task_success
 
 class GeneralInfo(Page):
 
     @staticmethod
     def before_next_page(player, timeout_happened):
-        # Assign a random digit when moving from Instructions to CountDigitTask
-        player.target_digit = random.randint(0, 9)
+        pass
+        # player.target_digit = random.randint(0, 9)
 
     def vars_for_template(player):
         return {
-            "etape": "la mesure d'aversion au risque et à l'ambiguité",             
+            "etape": "la mesure d'aversion au risque et à l'ambiguité",
         }
 
-class InvestmentIntroduction(Page):
-    def is_displayed(player):
-        return player.task_success
+
+class TaskSuccess(Page):
+    pass
+
+
+class InvestmentConfirm(Page):
+
+    def is_displayed(player: Player):
+        i = player.i_decision
+        result = (
+            i <= 4
+            or (i == 5 and player.inv1 == 10)
+            or (i == 6 and player.inv2 == 10)
+            or (i == 7 and player.inv3 == 10)
+            or (i == 8 and player.inv4 == 10)
+            or (i == 9)
+        )
+        if not result:
+            player.i_decision += 1
+        return result
+
+    def before_next_page(player: Player, timeout_happened):
+        player.i_decision += 1
+
+    def vars_for_template(player: Player):
+        return {
+            "i_decision": player.i_decision,
+            "inv1_4": [player.inv1, player.inv2, player.inv3, player.inv4],
+            "inv5_8": [
+                player.field_maybe_none("inv5"),
+                player.field_maybe_none("inv6"),
+                player.field_maybe_none("inv7"),
+                player.field_maybe_none("inv8"),
+            ],
+        }
 
 
 class InvestmentIntro1(Page):
     pass
+
 
 class InvestmentDecision1(Page):
     form_model = "player"
     form_fields = ["inv1"]
 
 
-class InvestmentConfirm1(Page):
-    def vars_for_template(player: Player):
-        return {'payoff': player.payoff}
-        # DÉCISION 2
-
 class InvestmentIntro2(Page):
     pass
+
 
 class InvestmentDecision2(Page):
     form_model = "player"
     form_fields = ["inv2"]
 
 
-def vars_for_template(player):
-    if player.inv2 is not None:
-        invested = player.inv2
-    else:
-        invested = 0  # valeur par défaut
-
-    kept = 10 - invested
-    return {
-        "invested": invested,
-        "kept": kept,
-        "gain_if_yellow": kept + 3 * invested,
-        "gain_if_purple": kept,
-    }
-
-
-class InvestmentConfirm2(Page):
-    def vars_for_template(player):
-        return {
-            "invested": player.inv2,
-            "kept": 10 - player.inv2,
-            "gain_if_yellow": (10 - player.inv2) + 3 * player.inv2,
-            "gain_if_purple": 10 - player.inv2,
-        }
-
-
-# DÉCISION 3
-
 class InvestmentIntro3(Page):
     pass
+
 
 class InvestmentDecision3(Page):
     form_model = "player"
     form_fields = ["inv3"]
 
 
-class InvestmentConfirm3(Page):
-    def vars_for_template(player):
-        non_invested = 10 - player.inv3
-        return {
-            "invested": player.inv3,
-            "non_invested": non_invested,
-            "total_loss_yellow": non_invested,
-            "total_loss_purple": non_invested + 3 * player.inv3,
-        }
-
-
-# DÉCISION 4
-
 class InvestmentIntro4(Page):
     pass
+
 
 class InvestmentDecision4(Page):
     form_model = "player"
     form_fields = ["inv4"]
 
 
-class InvestmentConfirm4(Page):
-    def vars_for_template(player):
-        non_invested = 10 - player.inv4
+class InvestmentDecision5(Page):
+    form_model = "player"
+    form_fields = ["inv5"]
+
+    def is_displayed(player: Player):
+        return player.inv1 == 10
+
+    def vars_for_template(player: Player):
         return {
-            "invested": player.inv4,
-            "non_invested": non_invested,
-            "total_loss_yellow": non_invested,
-            "total_loss_purple": non_invested + 3 * player.inv4,
+            "i_decision": player.i_decision,
+            "inv1_4": [player.inv1, player.inv2, player.inv3, player.inv4],
+            "inv5_8": [
+                player.field_maybe_none("inv5"),
+                player.field_maybe_none("inv6"),
+                player.field_maybe_none("inv7"),
+                player.field_maybe_none("inv8"),
+            ],
         }
 
-page_sequence = [
-    #GeneralInfo,
-    CountDigitTask,
-    InvestmentIntroduction,
-    InvestmentIntro1,
+
+class InvestmentDecision6(Page):
+    form_model = "player"
+    form_fields = ["inv6"]
+
+    def is_displayed(player: Player):
+        return player.inv2 == 10
+
+    def vars_for_template(player: Player):
+        return {
+            "i_decision": player.i_decision,
+            "inv1_4": [player.inv1, player.inv2, player.inv3, player.inv4],
+            "inv5_8": [
+                player.field_maybe_none("inv5"),
+                player.field_maybe_none("inv6"),
+                player.field_maybe_none("inv7"),
+                player.field_maybe_none("inv8"),
+            ],
+        }
+
+
+class InvestmentDecision7(Page):
+    form_model = "player"
+    form_fields = ["inv7"]
+
+    def is_displayed(player: Player):
+        return player.inv3 == 10
+
+    def vars_for_template(player: Player):
+        return {
+            "i_decision": player.i_decision,
+            "inv1_4": [player.inv1, player.inv2, player.inv3, player.inv4],
+            "inv5_8": [
+                player.field_maybe_none("inv5"),
+                player.field_maybe_none("inv6"),
+                player.field_maybe_none("inv7"),
+                player.field_maybe_none("inv8"),
+            ],
+        }
+
+
+class InvestmentDecision8(Page):
+    form_model = "player"
+    form_fields = ["inv8"]
+
+    def is_displayed(player: Player):
+        return player.inv4 == 10
+
+    def vars_for_template(player: Player):
+        return {
+            "i_decision": player.i_decision,
+            "inv1_4": [player.inv1, player.inv2, player.inv3, player.inv4],
+            "inv5_8": [
+                player.field_maybe_none("inv5"),
+                player.field_maybe_none("inv6"),
+                player.field_maybe_none("inv7"),
+                player.field_maybe_none("inv8"),
+            ],
+        }
+
+
+# Création de page_sequence
+
+intros_1_4 = [InvestmentIntro1, InvestmentIntro2, InvestmentIntro3, InvestmentIntro4]
+decisions_1_4 = [
     InvestmentDecision1,
-    InvestmentConfirm1,
-    InvestmentIntro2,
     InvestmentDecision2,
-    InvestmentConfirm2,
-    InvestmentIntro3,
     InvestmentDecision3,
-    InvestmentConfirm3,
-    InvestmentIntro4,
     InvestmentDecision4,
-    InvestmentConfirm4,
 ]
+
+page_sequence = [
+    GeneralInfo,
+    CountDigitTask,
+    TaskSuccess,
+]
+for intro, decision in zip(intros_1_4, decisions_1_4):
+    page_sequence.extend([intro, decision, InvestmentConfirm])
+
+for page in [
+    InvestmentDecision5,
+    InvestmentDecision6,
+    InvestmentDecision7,
+    InvestmentDecision8,
+]:
+    page_sequence.extend([page, InvestmentConfirm])

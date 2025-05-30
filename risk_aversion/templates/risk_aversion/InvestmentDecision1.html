@@ -1,45 +1,21 @@
-{% load static %}
-
 {% block title %} Investissez vos jetons – Décision 1 {% endblock %} 
 {% block content %}
 
 <p><strong>Combien souhaitez-vous investir ?</strong></p>
 
-    {% formfields %}  
-  
-  <div id="preview">
-    <p> -> je garde <span id="kept">nb_jetons</span> jetons</p>
-    <strong>Vos jetons après tirage :</strong>
-    <ul>
-      <li>🟡 Boule JAUNE : <span id="gains_if_yellow">jaune</span></li>
-      <li>🟣 Boule VIOLETTE : <span id="gains_if_purple">violette</span></li>
-    </ul>
-    
-    
-  </div>
- 
-  {% next_button %}
+{% formfields %}
 
-  <script>
-    const selectInput = document.querySelector('select[name=inv1]');
-const max_investment = parseFloat("{{C.MAX_INVESTMENT }}");
-const kept = document.getElementById('kept');
-const gains_if_yellow = document.getElementById('gains_if_yellow');
-const gains_if_purple = document.getElementById('gains_if_purple');
-  
+<div id="preview">
+  <p>-> je garde <strong id="kept"></strong> jetons</p>
+  <strong>Vos jetons après tirage :</strong>
+  <ul>
+    <li>🟡 Boule JAUNE : <span id="gains_if_yellow"></span></li>
+    <li>🟣 Boule VIOLETTE : <span id="gains_if_purple"></span></li>
+  </ul>
+</div>
 
-function updateMessage() {
-    const selected = selectInput.value;
-    kept_value = max_investment - selected;
-    kept.textContent = kept_value;
-    gains_if_yellow.textContent = kept_value + " jetons gardés + 3 x " + selected + " jetons gagnés = " + (kept_value+3*selected)
-    gains_if_purple.textContent = kept_value + " jetons gardés"
-}
+{% next_button %} 
 
-selectInput.addEventListener('change', updateMessage);
-document.addEventListener('DOMContentLoaded', updateMessage);
+{{ include_sibling 'scripts.html'}} 
 
-  </script>
 {% endblock %}
-
-  

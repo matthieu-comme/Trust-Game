@@ -1,16 +1,41 @@
 {{ block title }} Investissez vos jetons – Décision 1 {{ endblock }} 
+
 {% block content %}
 
 <p>Avec {{ C.MAX_INVESTMENT }} de <strong>vos</strong> jetons, vous pouvez :</p>
+
 <ul>
   <li>💰 tous les garder</li>
-  <li>🎲 ou en investir en partie ou en totalité dans un jeu risqué</li>
+  <li>🎲 ou les investir en partie ou en totalité dans un jeu risqué</li>
 </ul>
 
-<p>🔍 Le jeu risqué :</p>
-<p>Une urne contient 12 boules : 6 🟡 jaunes et 6 🟣 violettes</p>
+<p>🔍 Comment fonctionne le jeu risqué ?</p>
+
+<p>Un tirage au sort est effectué dans une urne contenant 12 boules : 6 🟡 jaunes et 6 🟣 violettes</p>
+
+<img src="https://i.imgur.com/T12tuNt.jpeg" width="">
+
+<p>Avec autant de boules 🟡 que 🟣, vous avez 1 chance sur 2 de tirer chaque boule : </p>
+
 <ul>
-  <li>🟡 JAUNE : vous gagnez 3 fois les jetons investis</li>
-  <li>🟣 VIOLET : vous perdez les jetons investis</li>
+  <li>🟡 tirage JAUNE : vous gagnez 3 fois les jetons investis</li>
+  <li>🟣 tirage VIOLET : vous perdez les jetons investis</li>
 </ul>
-{{ next_button }} {% endblock %}
+
+<p><strong>Exemple :</strong> Vous investissez 4 jetons (et en gardez 6).</p>
+<ul>
+  <li><strong>🟡 tirage JAUNE :</strong> vous gagnez 3 × 4 jetons = 12 jetons</li>
+
+  <ul>
+      <li>Votre total : 12 gagnés + 6 gardés = 18 jetons</li>
+  </ul>
+
+  <li><strong>🟣 tirage VIOLET :</strong> vous perdez les 4 jetons investis et ne gagnez donc rien</li>
+
+  <ul>
+      <li>Vote total : 0 gagné + 6 gardés = 6 jetons</li>
+  </ul>
+</ul>
+{{ next_button }} 
+
+{% endblock %}

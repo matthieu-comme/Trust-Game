@@ -1,0 +1,63 @@
+<script>
+  i_decision = parseInt("{{player.i_decision}}");
+  console.log("i = " + i_decision);
+  const selectInput = document.querySelector(
+    "select[name=inv" + i_decision + "]"
+  );
+  const max_investment = parseFloat("{{C.MAX_INVESTMENT }}");
+  const kept = document.getElementById("kept");
+  const gains_if_yellow = document.getElementById("gains_if_yellow");
+  const gains_if_purple = document.getElementById("gains_if_purple");
+
+  function updateMessage() {
+    const invested = selectInput.value;
+    const kept_value = max_investment - invested;
+    kept.textContent = kept_value;
+    let result;
+
+    switch (i_decision) {
+      case 1:
+      case 2:
+        result = update_D1_D2(kept_value, invested);
+        break;
+      case 3:
+      case 4:
+        result = update_D3_D4(kept_value, invested);
+        break;
+    }
+
+    gains_if_yellow.textContent = result.yellow;
+    gains_if_purple.textContent = result.purple;
+  }
+
+  function update_D1_D2(kept_value, invested) {
+    const yellow =
+      kept_value +
+      " jetons gardés + 3 x " +
+      invested +
+      " jetons gagnés = " +
+      (kept_value + 3 * invested);
+
+    const purple = kept_value + " jetons gardés";
+    return { yellow, purple };
+  }
+
+  function update_D3_D4(kept_value, invested) {
+    let yellow, purple;
+    if (invested == "0") {
+      yellow = purple = "Vous perdez les 10 jetons";
+    } else {
+      yellow = purple = "Vous perdez " + kept_value + " jetons non-investis";
+      purple +=
+        " + 3 x " +
+        invested +
+        " jetons investis = " +
+        (kept_value + 3 * invested) +
+        " jetons perdus";
+    }
+    return { yellow, purple };
+  }
+
+  selectInput.addEventListener("change", updateMessage);
+  document.addEventListener("DOMContentLoaded", updateMessage);
+</script>
