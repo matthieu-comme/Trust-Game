@@ -1,0 +1,29 @@
+{{ block title }} Investissez vos jetons – Décision {{ player.i_decision }} {{ endblock }} 
+{{ block content }}
+
+<p><strong>Combien souhaitez-vous investir ?</strong></p>
+
+{{ if player.i_decision == 1 }}
+    {{ formfield 'inv1' }}
+{{ elif player.i_decision == 2}}
+    {{ formfield 'inv2' }}
+{{ elif player.i_decision == 3}}
+    {{ formfield 'inv3' }}
+{{ elif player.i_decision == 4}}
+    {{ formfield 'inv4' }}
+{{ endif }}
+
+<div id="preview">
+  <p id="kept"></p>
+  <strong>Vos jetons après tirage :</strong>
+  <ul>
+    <li>🟡 Boule JAUNE : <span id="gains_if_yellow"></span></li>
+    <li>🟣 Boule VIOLETTE : <span id="gains_if_purple"></span></li>
+  </ul>
+</div>
+
+{{ next_button }} 
+
+{{ include_sibling 'scripts.html'}} 
+
+{{ endblock }}

@@ -1,6 +1,5 @@
 <script>
   i_decision = parseInt("{{player.i_decision}}");
-  console.log("i = " + i_decision);
   const selectInput = document.querySelector(
     "select[name=inv" + i_decision + "]"
   );
@@ -12,7 +11,7 @@
   function updateMessage() {
     const invested = selectInput.value;
     const kept_value = max_investment - invested;
-    kept.textContent = kept_value;
+    kept.innerHTML = updateKept(kept_value);
     let result;
 
     switch (i_decision) {
@@ -30,6 +29,23 @@
     gains_if_purple.textContent = result.purple;
   }
 
+  // retourne le message concernant les jetons gardés
+  function updateKept(kept_value) {
+    let result;
+    if (i_decision == 1 || i_decision == 2) {
+      result = "-> je garde <strong>" + kept_value + "</strong> jetons";
+    } else {
+      result =
+        "-> donc je ne mise pas les <strong>" +
+        kept_value +
+        "</strong> autres jetons qui sont définitivement perdus";
+    }
+    return result;
+  }
+
+  // Ces fonctions retournent les textes correspondant aux tirages jaune et violet en fonction de la décision
+  // prennent en paramètres le nb de jetons gardés et investis
+
   function update_D1_D2(kept_value, invested) {
     const yellow =
       kept_value +
@@ -39,6 +55,7 @@
       (kept_value + 3 * invested);
 
     const purple = kept_value + " jetons gardés";
+
     return { yellow, purple };
   }
 

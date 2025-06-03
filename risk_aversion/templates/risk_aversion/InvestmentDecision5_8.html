@@ -1,0 +1,18 @@
+{{ block title }} Investissez vos jetons – Décision {{ player.i_decision }} {{ endblock }} 
+{% block content %}
+
+<p>Ceci est la Décision {{ player.i_decision }} </p>
+
+{{ if player.i_decision == 5 }}
+    {{ formfield 'inv5' }}
+{{ elif player.i_decision == 6}}
+    {{ formfield 'inv6' }}
+{{ elif player.i_decision == 7}}
+    {{ formfield 'inv7' }}
+{{ elif player.i_decision == 8}}
+    {{ formfield 'inv8' }}
+{{ endif }}
+
+{{ next_button }} 
+
+{% endblock %}
