@@ -1,10 +1,42 @@
-{{ block title }} Investissez vos jetons – Décision {{ player.i_decision }} {{ endblock }} 
+{{ block title }} Investissez vos jetons – Décision {{ i_visible }} {{ endblock }} 
 {% block content %}
 
-<p>Ceci est la Décision {{ player.i_decision }} </p>
+<p>Ceci est en réalité la Décision {{ i_decision }} </p>
+<p>Vous allez maintenant choisir un <strong>tirage au sort parmi plusieurs tirages possibles</strong>.</p>
+<p>
+    Chaque tirage correspond à une urne contenant des boules de couleurs
+    différentes : JAUNE 🟡 , VIOLETTE 🟣 ou BLEUE 🔵 {% if i_decision == 6 or
+    i_decision == 8 %} mais vous ne connaissez pas le nombre. {% endif %}<br />
+    La couleur tirée détermine le nombre de jetons que vous gagnez.
+  </p>
+  <ul>
+    {{ for li in li_items }}
+    <li>{{ li }}</li>
+    {{ endfor }}
+  </ul>
+  <p><strong>Choisissez votre tirage préféré :</strong></p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Option</th>
+        <th>Contenu de l'urne</th>
+        <th>Résultat du tirage</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for letter, box, result in rows %}
+      <tr>
+        <td>{{ letter }}</td>
+        <td>{{ box }}</td>
+        <td>{{ result }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-{{ if player.i_decision == 5 }}
-    {{ formfield 'inv5' }}
+{{ if player.i_decision == 5 }}    
+    {{ formfield 'inv5' }}    
 {{ elif player.i_decision == 6}}
     {{ formfield 'inv6' }}
 {{ elif player.i_decision == 7}}
@@ -15,4 +47,10 @@
 
 {{ next_button }} 
 
+<style>
+    table, td {
+      border: 1px solid black;
+    }
+  </style>
+  
 {% endblock %}
