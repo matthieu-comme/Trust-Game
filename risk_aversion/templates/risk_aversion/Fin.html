@@ -1,9 +1,16 @@
-{{ block title }} FIN {{ endblock }}
+{{ block title }} FIN {{ endblock }} 
 
 {{ block content }}
 
-<p>Fin de risk_aversion</p>
+<p><strong>Résultats du tirage au sort:</strong></p>
+<ul>
+  <li>N° Décision : {{ i_visible }} ( en réalité {{ i_final }} )</li>
+  <li>Choix lors de cette décision : {{ invested }}</li>
+  <li>Boule tirée : {{ ball_color }}</li>
+  <li>Profit associé : {{ profit | to0 }}</li>
+  <li>Votre total de jetons: {{ payoff | to0 }}</li>
+</ul>
 
-{{ next_button  }}
+{{ next_button }} 
 
 {{ endblock }}
