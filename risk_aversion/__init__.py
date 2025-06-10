@@ -113,6 +113,15 @@ class Player(BasePlayer):
 
         return result
 
+    # conserve les infos importantes concernant la décision tirée au sort pour les afficher à la toute fin de l'expérience
+    def set_participant_vars(self):
+        vars = self.participant.vars
+        vars["i_decision"] = self.i_visible(self.i_final)
+        vars["invested"] = getattr(self, f"inv{self.i_final}")
+        vars["ball_color"] = self.ball_color
+        vars["profit"] = self.profit
+        vars["payoff"] = self.payoff
+
 
 # ----- FONCTIONS -----
 
@@ -134,6 +143,7 @@ def display_logic(player: Player) -> bool:
 # utilisée pour debugger
 def getTemplate(player: Player) -> dict:
     return {
+        "participant.payoff": player.participant.payoff,
         "i_decision": player.i_decision,
         "i_visible": player.i_visible(),
         "i_final": player.i_final,
@@ -299,7 +309,7 @@ class CountDigitTask(Page):
             return f"Incorrect. Réessayez."
 
     def vars_for_template(player):
-        return dict(
+        return getTemplate(player) | dict(
             pi_digits=C.PI_DIGITS,
             digit=player.target_digit,
         )
@@ -425,7 +435,19 @@ class Fin(Page):
             "ball_color": player.ball_color,
             "profit": player.profit,
             "payoff": player.payoff,
+            "participant.payoff": player.participant.payoff,
         }
+
+    def before_next_page(player: Player, timeout_happened):
+        player.set_participant_vars()
+
+    @staticmethod
+    def app_after_this_page(player: Player, upcoming_apps):
+        index = player.participant.vars["app_index"]
+        if index < 3:
+            app_to_go = player.participant.vars["app_order"][index]
+            player.participant.vars["app_index"] += 1
+            return app_to_go
 
 
 # Création de page_sequence

@@ -1,14 +1,6 @@
 {% extends "global/Page.html" %} {% block content %}
 
 <h2>Quiz de compréhension</h2>
-{% if form.errors %}
-<div class="alert alert-danger" role="alert">
-  <strong>Une ou plusieurs réponses sont incorrectes.</strong><br />
-  Veuillez relire attentivement les instructions ci-dessous, puis cliquez sur
-  <strong>« Réessayer »</strong> pour tenter à nouveau le quiz avec de nouvelles
-  valeurs.
-</div>
-{% endif %}
 
 <p>
   Veuillez répondre aux questions suivantes pour vérifier que vous avez bien
@@ -46,4 +38,8 @@
   Vrai ou faux : Si le joueur B vous renvoie des jetons, ce montant est triplé
   comme le montant que vous lui avez envoyé.
 </p>
-{{ formfield player.q4_true_false }}   {% if form.errors %} <a href="/p/{{ participant.code }}/trust_game/QuizExample2/3" class="btn btn-primary" type="submit">Réessayer</a> {% else %} {{ next_button }} {% endif %} </div> {% endblock %} 
+{{ formfield player.q4_true_false }}
+
+{{ next_button }}
+
+{% endblock %}

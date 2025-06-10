@@ -11,29 +11,14 @@ content }}
           <h4>Discussion (<span id="time_remaining">120</span>s restantes)</h4>
         </div>
         <div class="card-body">
-          <div
-            id="chat_history"
-            class="border p-2 mb-3"
-            style="height: 200px; overflow-y: auto"
-          ></div>
+          <div id="chat_history" class="border p-2 mb-3" style="height: 200px; overflow-y: auto"></div>
           <div id="typing_indicator" class="text-muted small mb-2 d-none">
             <i>L'autre joueur est en train d'écrire...</i>
           </div>
           <form id="chat_form" onsubmit="return false;">
             <div class="input-group">
-              <input
-                type="text"
-                id="chat_input"
-                class="form-control"
-                placeholder="Tapez votre message..."
-                disabled
-              />
-              <button
-                id="send_msg_button"
-                class="btn btn-outline-secondary"
-                type="button"
-                disabled
-              >
+              <input type="text" id="chat_input" class="form-control" placeholder="Tapez votre message..." disabled />
+              <button id="send_msg_button" class="btn btn-outline-secondary" type="button" disabled>
                 Envoyer
               </button>
             </div>
@@ -69,15 +54,8 @@ content }}
               <p>Vous avez {{ C.ENDOWMENT }} jetons.</p>
               <p>Combien souhaitez-vous envoyer au Joueur B?</p>
               <div class="form-group mb-3">
-                <input
-                  type="number"
-                  id="amount_input"
-                  class="form-control"
-                  min="0"
-                  max="{{ C.ENDOWMENT }}"
-                  step="1"
-                  required
-                />
+                <input type="number" id="amount_input" class="form-control" min="0" max="{{ C.ENDOWMENT }}" step="1"
+                  required />
                 <div class="invalid-feedback">
                   Veuillez entrer un montant entre 0 et {{ C.ENDOWMENT }}.
                 </div>
@@ -109,23 +87,12 @@ content }}
                 </p>
                 <p>Combien souhaitez-vous renvoyer au Joueur A?</p>
                 <div class="form-group mb-3">
-                  <input
-                    type="number"
-                    id="amount_back_input"
-                    class="form-control"
-                    min="0"
-                    step="1"
-                    required
-                  />
+                  <input type="number" id="amount_back_input" class="form-control" min="0" step="1" required />
                   <div class="invalid-feedback">
                     Veuillez entrer un montant valide.
                   </div>
                 </div>
-                <button
-                  id="send_back_button"
-                  class="btn btn-primary"
-                  type="button"
-                >
+                <button id="send_back_button" class="btn btn-primary" type="button">
                   Renvoyer
                 </button>
               </div>
@@ -150,8 +117,8 @@ content }}
 {{ endblock }} {{ block scripts }}
 <script>
   // Variables globales
-  const CHAT_DURATION = 120; // 2 minutes en secondes
-  let timeRemaining = CHAT_DURATION;
+  let expireTime = parseFloat("{{ group.expire_time }}");
+  let timeRemaining;
   let chatTimer;
   let typingTimer;
   let isTyping = false;
@@ -162,13 +129,18 @@ content }}
 
   // Fonction pour mettre à jour le timer du chat
   function updateChatTimer() {
-    timeRemaining--;
+    updateTimeRemaining();
     document.getElementById("time_remaining").textContent = timeRemaining;
 
     if (timeRemaining <= 0) {
       clearInterval(chatTimer);
       disableChat();
     }
+  }
+
+  function updateTimeRemaining() {
+    const now = Date.now() / 1000;
+    timeRemaining = Math.max(parseInt(expireTime - now), 0);
   }
 
   // Fonction pour désactiver le chat
@@ -337,6 +309,7 @@ content }}
 
   // Gestion des messages live
   function liveRecv(data) {
+
     // Mise à jour du chat
     if (data.new_message || data.full_chat) {
       const chatHistory = document.getElementById("chat_history");

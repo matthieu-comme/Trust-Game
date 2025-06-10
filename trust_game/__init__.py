@@ -1,13 +1,15 @@
 from otree.api import *
 import random
+import time
 
 
 class C(BaseConstants):
     NAME_IN_URL = "trust_game"
     PLAYERS_PER_GROUP = 2
     NUM_ROUNDS = 1
-    ENDOWMENT = 10
+    ENDOWMENT = 10  # somme initiale du joueur A
     MULTIPLIER = 3
+    CHAT_DURATION = 120  # 2 min de conversation
 
 
 class Subsession(BaseSubsession):
@@ -17,6 +19,7 @@ class Subsession(BaseSubsession):
 class Group(BaseGroup):
     amount_sent = models.CurrencyField(min=0, max=C.ENDOWMENT)
     amount_sent_back = models.CurrencyField()
+    expire_time = models.FloatField()  # temps d'expiration du chat
 
     def set_payoffs(self):
         sent = self.amount_sent
@@ -32,21 +35,18 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     # Réponses des participants
-    q1_b_receive = models.IntegerField(label="")
-    q2_a_get_back = models.IntegerField(label="")
-    q3_a_final = models.IntegerField(label="")
-    q3_b_final = models.IntegerField(label="")
+    q1_b_receive = models.IntegerField()
+    q2_a_get_back = models.IntegerField()
+    q3_a_final = models.IntegerField()
+    q3_b_final = models.IntegerField()
     q4_true_false = models.StringField(
         label="", choices=["Vrai", "Faux"], widget=widgets.RadioSelect
     )
     x = models.IntegerField()
     y = models.IntegerField()
     z = models.IntegerField()
-    retry_attempt = models.IntegerField(initial=0)
-    quiz_passed = models.BooleanField(initial=False)
     message = models.LongStringField(blank=True)
     chat_history = models.LongStringField(initial="")
-    waiting_for_partner = models.BooleanField(initial=False)
 
 
 class BaseQuiz(Page):
@@ -60,14 +60,25 @@ class BaseQuiz(Page):
     ]
 
     @staticmethod
-    def vars_for_template(player):
+    def vars_for_template(player: Player):
+        # affectation des éléments de questions
         player.x = random.randint(2, 10)
-        player.y = random.choice([3, 6, 9, 12, 15, 18, 21, 24, 27, 30])
+
+        mult = C.MULTIPLIER
+        max_choice = mult * C.ENDOWMENT
+        choice_list = [x for x in range(mult, max_choice + 1) if x % mult == 0]
+        player.y = random.choice(choice_list)
+
         player.z = random.randint(1, player.y)
-        return dict(x=player.x, y=player.y, z=player.z)
+        return {
+            "participant": player.participant,
+            "x": player.x,
+            "y": player.y,
+            "z": player.z,
+        }
 
     @staticmethod
-    def error_message(player, values):
+    def error_message(player: Player, values):
         errors = {}
         correct_q1 = player.x * C.MULTIPLIER
 
@@ -93,71 +104,20 @@ class BaseQuiz(Page):
 
         return errors or None
 
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        if (
-            player.q1_b_receive == player.x * C.MULTIPLIER
-            and player.q2_a_get_back == player.z
-            and player.q3_a_final == 8
-            and player.q3_b_final == 10
-            and player.q4_true_false == "Faux"
-        ):
-            player.quiz_passed = True
-        else:
-            player.quiz_passed = False
-
 
 class QuizExample1(BaseQuiz):
-    @staticmethod
-    def is_displayed(player):
-        return not player.quiz_passed
-
-
-class QuizExample2(BaseQuiz):
-    @staticmethod
-    def is_displayed(player):
-        return not player.quiz_passed
-
-
-class QuizExample3(BaseQuiz):
-    @staticmethod
-    def is_displayed(player):
-        return not player.quiz_passed
-
-
-class QuizExample4(BaseQuiz):
-    @staticmethod
-    def is_displayed(player):
-        return not player.quiz_passed
-
-
-class QuizExample5(BaseQuiz):
-    @staticmethod
-    def is_displayed(player):
-        return not player.quiz_passed
+    pass
 
 
 class Instructions(Page):
-    @staticmethod
-    def is_displayed(player):
-        return not player.quiz_passed
-
-
-class BeginRealGame(Page):
-    @staticmethod
-    def is_displayed(player):
-        return player.round_number == 1  # seulement après le test
-
-    def vars_for_template(player):
-        return dict(name=player.participant.label or f"Joueur {player.id_in_group}")
+    pass
 
 
 # Méthode commune pour gérer les messages du chat
-def handle_chat_message(player, data):
+def handle_chat_message(player: Player, data):
     if "message" in data:
-        message_html = (
-            f"<strong>Joueur {player.id_in_group}:</strong> {data['message']}<br>"
-        )
+        letter = "A" if player.id_in_group == 1 else "B"
+        message_html = f"<strong>Joueur {letter}:</strong> {data['message']}<br>"
 
         # Ajouter le message à l'historique du chat du joueur
         player.chat_history += message_html
@@ -169,12 +129,12 @@ def handle_chat_message(player, data):
         for p in player.group.get_players():
             if p.id_in_group != player.id_in_group:
                 p.chat_history += message_html
-                responses[p.id_in_subsession] = {
+                responses[p.id_in_group] = {
                     "new_message": message_html,
                     "full_chat": p.chat_history,
                 }
             else:
-                responses[p.id_in_subsession] = {"full_chat": p.chat_history}
+                responses[p.id_in_group] = {"full_chat": p.chat_history}
 
         return responses
     return None
@@ -182,26 +142,26 @@ def handle_chat_message(player, data):
 
 class SyncWaitPage(WaitPage):
 
-    @staticmethod
-    def is_displayed(player):
-        return player.quiz_passed and not player.waiting_for_partner
+    def after_all_players_arrive(group: Group):
+        if group.field_maybe_none("expire_time") is None:
+            group.expire_time = time.time() + C.CHAT_DURATION
 
-    @staticmethod
-    def after_all_players_arrive(group):
-        # Quand les 2 joueurs arrivent, on peut commencer le jeu
-        for p in group.get_players():
-            p.waiting_for_partner = False
+    def vars_for_template(player: Player):
+        other_player = player.get_others_in_group()[0]
+        other_participant_number = other_player.participant.id_in_session
+        return {
+            "other_player": other_player,
+            "other_participant_number": other_participant_number,
+        }
 
 
 class GamePlay(Page):
 
     @staticmethod
-    def is_displayed(player):
-        # S'assurer que les 2 ont réussi le quiz
-        return all(p.quiz_passed for p in player.group.get_players())
+    def live_method(player: Player, data):
 
-    @staticmethod
-    def live_method(player, data):
+        if "time_remaining" in data:
+            player.time_remaining = data["time_remaining"]
         # Gérer les messages du chat
         if "message" in data:
             return handle_chat_message(player, data)
@@ -213,7 +173,7 @@ class GamePlay(Page):
             # Informer l'autre joueur uniquement
             for p in player.group.get_players():
                 if p.id_in_group != player.id_in_group:
-                    responses[p.id_in_subsession] = {
+                    responses[p.id_in_group] = {
                         "other_player_typing": is_typing,
                         "player_id": player.id_in_group,
                     }
@@ -228,12 +188,12 @@ class GamePlay(Page):
                 responses = {}
                 for p in player.group.get_players():
                     if p.id_in_group == 1:  # Joueur A
-                        responses[p.id_in_subsession] = {
+                        responses[p.id_in_group] = {
                             "status": "sent",
                             "amount_sent": amount,
                         }
                     else:  # Joueur B
-                        responses[p.id_in_subsession] = {
+                        responses[p.id_in_group] = {
                             "status": "received",
                             "amount_sent": amount,
                             "tripled_amount": int(amount * C.MULTIPLIER),
@@ -250,7 +210,7 @@ class GamePlay(Page):
                 # Notifier les deux joueurs que la transaction est complète
                 responses = {}
                 for p in player.group.get_players():
-                    responses[p.id_in_subsession] = {
+                    responses[p.id_in_group] = {
                         "status": "complete",
                         "can_proceed": True,
                         "amount_sent": player.group.amount_sent,
@@ -263,7 +223,7 @@ class GamePlay(Page):
         return None
 
     @staticmethod
-    def js_vars(player):
+    def js_vars(player: Player):
         return {
             "id_in_group": player.id_in_group,
             "endowment": C.ENDOWMENT,
@@ -273,13 +233,13 @@ class GamePlay(Page):
 
 class WaitForResults(WaitPage):
     @staticmethod
-    def after_all_players_arrive(group):
+    def after_all_players_arrive(group: Group):
         group.set_payoffs()
 
 
 class Results(Page):
     @staticmethod
-    def vars_for_template(player):
+    def vars_for_template(player: Player):
         group = player.group
         sent = int(group.amount_sent)
         sent_back = int(group.amount_sent_back)
@@ -292,14 +252,18 @@ class Results(Page):
             is_test_round=(player.round_number == 1),
         )
 
+    @staticmethod
+    def app_after_this_page(player: Player, upcoming_apps):
+        index = player.participant.vars["app_index"]
+        if index < 3:
+            app_to_go = player.participant.vars["app_order"][index]
+            player.participant.vars["app_index"] += 1
+            return app_to_go
+
 
 page_sequence = [
     Instructions,
-    QuizExample1,
-    QuizExample2,
-    QuizExample3,
-    QuizExample4,
-    QuizExample5,
+    # QuizExample1,
     SyncWaitPage,
     GamePlay,
     Results,
