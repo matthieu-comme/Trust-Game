@@ -34,18 +34,21 @@ class Player(BasePlayer):
 # FONCTIONS
 
 
-def get_all_links():
+def get_all_link_codes(session_code: str) -> list:
     s = requests.Session()
+
     # si connexion à otree nécessaire
     # s.post(f'{C.BASE_URL}/accounts/login/', data={'username': C.USERNAME,'password': C.PASSWORD,})
-    r = s.get(f"{C.BASE_URL}/sessions/")
+    r = s.get(f"{C.BASE_URL}/SessionStartLinks/{session_code}")
+
     soup = BeautifulSoup(r.text, "html.parser")
 
-    for a in soup.find_all("a", href=True):
-        if a["href"].startswith("/Session/"):
-            session_page = s.get(C.BASE_URL + a["href"])
-            if "JoinSession" in session_page.text:
-                print(session_page.text.split("JoinSession/")[1].split("/")[0])
+    result = []
+    for a in soup.select(".participant-link"):
+        link_code = a.getText().split("/")[-1]
+        result.append(link_code)
+
+    return result
 
 
 class Welcome(Page):
