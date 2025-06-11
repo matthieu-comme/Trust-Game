@@ -1,12 +1,36 @@
 from os import environ
 
-
+PLAYERS_PER_GROUP = 20
 SESSION_CONFIGS = [
     dict(
         name="experiment_randomized",
         display_name="Expérience randomisée par groupe",
-        num_demo_participants=60,
+        num_demo_participants=3 * PLAYERS_PER_GROUP,
         app_sequence=["dispatcher", "questionnaire", "trust_game", "risk_aversion"],
+    ),
+    dict(
+        name="dispatcher_2",
+        display_name="Dispatcher 2",
+        num_demo_participants=3 * PLAYERS_PER_GROUP,
+        app_sequence=["dispatcher_2"],
+    ),
+    dict(
+        name="groupe_1",
+        display_name="Groupe 1",
+        num_demo_participants=PLAYERS_PER_GROUP,
+        app_sequence=["questionnaire", "risk_aversion", "trust_game"],
+    ),
+    dict(
+        name="groupe_2",
+        display_name="Groupe 2",
+        num_demo_participants=PLAYERS_PER_GROUP,
+        app_sequence=["risk_aversion", "questionnaire", "trust_game"],
+    ),
+    dict(
+        name="groupe_3",
+        display_name="Groupe 3",
+        num_demo_participants=PLAYERS_PER_GROUP,
+        app_sequence=["questionnaire", "trust_game", "risk_aversion"],
     ),
     dict(
         name="risk_aversion",

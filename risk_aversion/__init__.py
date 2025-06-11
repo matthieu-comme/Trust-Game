@@ -38,10 +38,9 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    # Tâche de comptage
-    target_digit = models.IntegerField(
-        initial=0
-    )  # chiffre à compter lors de la tâche, généré dans GeneralInfo
+
+    # chiffre à compter lors de la tâche, généré dans GeneralInfo
+    target_digit = models.IntegerField(initial=0)
     pi_count = models.IntegerField(label="Combien de fois ce chiffre apparaît-il ?")
 
     # compteur suivant l'avancée dans les decisions
@@ -319,7 +318,7 @@ class CountDigitTask(Page):
 
 
 class GeneralInfo(Page):
-
+    # Génère aléatoirement le chiffre à compter
     @staticmethod
     def before_next_page(player, timeout_happened):
         pass
@@ -423,9 +422,9 @@ class TirageFinal(Page):
 class Fin(Page):
     # pour essayer plusieurs tirages consécutifs
     # def is_displayed(player: Player):
-    #    player.profit = finalProfit(player)
-    #    player.payoff += player.profit
-    #    return True
+    # player.profit = finalProfit(player)
+    # player.payoff += player.profit
+    # return True
 
     def vars_for_template(player: Player):
         return {

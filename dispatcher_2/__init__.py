@@ -1,18 +1,16 @@
 from otree.api import *
+import requests
+from bs4 import BeautifulSoup
 
 
 class C(BaseConstants):
-    NAME_IN_URL = "dispatcher"
-    PLAYERS_PER_GROUP = 20
+    NAME_IN_URL = "dispatcher_2"
+    PLAYERS_PER_GROUP = 60
     NUM_ROUNDS = 1
     NUM_APPS = 3
-    PERMUTATIONS = [
-        # ("trust_game", "questionnaire", "risk_aversion"), permutation test tg
-        ("risk_aversion", "trust_game", "questionnaire"),
-        # ("questionnaire", "risk_aversion", "trust_game"), # Groupe 1
-        ("risk_aversion", "questionnaire", "trust_game"),  # Groupe 2
-        ("questionnaire", "trust_game", "risk_aversion"),  # Groupe 3
-    ]
+    BASE_URL = "http://localhost:8000"
+    USERNAME = "admin"
+    PASSWORD = "admin"
 
 
 class Subsession(BaseSubsession):
@@ -31,6 +29,23 @@ class Player(BasePlayer):
             app_order = list(C.PERMUTATIONS[perm_index % len(C.PERMUTATIONS)])
             self.participant.vars["app_order"] = app_order
             self.participant.vars["app_index"] = 0
+
+
+# FONCTIONS
+
+
+def get_all_links():
+    s = requests.Session()
+    # si connexion à otree nécessaire
+    # s.post(f'{C.BASE_URL}/accounts/login/', data={'username': C.USERNAME,'password': C.PASSWORD,})
+    r = s.get(f"{C.BASE_URL}/sessions/")
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    for a in soup.find_all("a", href=True):
+        if a["href"].startswith("/Session/"):
+            session_page = s.get(C.BASE_URL + a["href"])
+            if "JoinSession" in session_page.text:
+                print(session_page.text.split("JoinSession/")[1].split("/")[0])
 
 
 class Welcome(Page):
