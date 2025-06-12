@@ -1,0 +1,93 @@
+{{ block title }} Investissez vos jetons – Décision {{ player.i_decision }} {{ endblock }} 
+
+{% block content %}
+
+<p>Avec {{ C.MAX_INVESTMENT }} de <strong>vos</strong> jetons, vous pouvez :</p>
+ 
+<ul>
+  {{ if player.i_decision == 1 or player.i_decision == 2 }}
+
+  <li>💰 tous les <strong>garder</strong></li>
+  <li>🎲 ou les <strong>investir en partie ou en totalité</strong> dans un jeu risqué</li>
+
+  {{ else }}
+
+  <li><strong>Ne rien faire</strong> → vous <strong>perdez</strong> les 10 jetons de manière certaine ;</li>
+  <li>🎲 ou les <strong>investir en partie ou en totalité</strong> dans un jeu risqué</li>
+
+  {{ endif }}
+</ul>
+
+<h5>🔍 Comment fonctionne ce jeu de hasard ?</h5>
+
+<p>Le résultat du jeu dépend d'un tirage au sort dans une urne contenant <strong>{{ C.BALL_NUMBER }} boules :</strong></p>
+
+<ul>
+  <li><span class="ball yellow"></span> {{ if player.i_decision == 1 or player.i_decision == 3 }} {{ ball_number_per_color }} {{ else }} des {{ endif }} boules <strong>JAUNES</strong></li>
+  <li><span class="ball purple"></span> {{ if player.i_decision == 1 or player.i_decision == 3 }} {{ ball_number_per_color }} {{ else }} des {{ endif }} boules <strong>VIOLETTES</strong></li>
+</ul>
+
+{{ if player.i_decision == 1 or player.i_decision == 3 }} 
+
+<p><strong>Vous avez donc 1 chance sur 2 de tirer chaque couleur :</strong></p>
+
+{{ else }} 
+
+<p>⚠️ Mais vous ne savez pas combien de boules <span class="ball yellow"></span> ou <span class="ball purple"></span> se trouvent dans l'urne.</p>
+<p>Il peut y avoir <strong>entre 0 et {{ ball_number_per_color }} boules</strong> <span class="ball yellow"></span> et <strong>entre 0 et {{ ball_number_per_color }} boules</strong> <span class="ball purple"></span>.</p>
+
+{{ endif }}
+
+<img src="https://i.imgur.com/CF4Tl4o.png" width="100">
+
+{{ if player.i_decision == 1 or player.i_decision == 2 }} 
+
+<ul>
+  <li><span class="ball yellow"></span> tirage <strong>JAUNE</strong> : vous <strong>gagnez 3 fois les jetons investis</strong></li>
+  <li><span class="ball purple"></span> tirage <strong>VIOLET</strong> : vous <strong>perdez les jetons investis</strong></li>
+</ul>
+
+<p><strong>💡 Exemple :</strong> Vous investissez <strong>4 jetons</strong> (et en gardez <strong>6</strong>).</p>
+<ul>
+  <li><strong><span class="ball yellow"></span> tirage JAUNE :</strong> vous gagnez 3 × 4 jetons = <strong>12 jetons</strong></li>
+
+  <ul>
+      <li>Total : 12 gagnés + 6 gardés = <strong>18 jetons</strong></li>
+  </ul>
+
+  <li><strong><span class="ball purple"></span> tirage VIOLET :</strong> vous perdez les 4 jetons investis et ne gagnez donc rien</li>
+
+  <ul>
+      <li>Total : 0 gagné + 6 gardés = <strong>6 jetons</strong></li>
+  </ul>
+</ul>
+
+{{ else }}
+
+<ul>
+  <li><span class="ball yellow"></span> tirage <strong>JAUNE</strong> : vous <strong>réduisez</strong> votre perte et récupérez les jetons investis</li>
+  <li><span class="ball purple"></span> tirage <strong>VIOLET</strong> : vous <strong>aggravez</strong> votre perte et perdez <strong>3 fois les jetons investis</strong> (en plus des jetons non investis)</li>
+</ul>
+
+<p><strong>💡 Exemple :</strong> Vous investissez 4 jetons et ne misez pas les 6 autres jetons.</p>
+<ul>
+  <li><strong><span class="ball yellow"></span> tirage JAUNE :</strong> vous récupérez les 4 jetons investis</li>
+
+  <ul>
+      <li>Total perdu: 6 jetons</li>
+  </ul>
+
+  <li><strong><span class="ball purple"></span> tirage VIOLET :</strong> vous perdez 3 x 4 = 12 jetons supplémentaires</li>
+
+  <ul>
+      <li>Vote total : 12 + 6 = 18 jetons</li>
+  </ul>
+</ul>
+
+{{ endif }}
+
+{{ next_button }} 
+
+{{ include_sibling 'style.html'}} 
+
+{% endblock %}

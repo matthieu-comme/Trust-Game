@@ -26,7 +26,7 @@ class C(BaseConstants):
         "82 148 086 513 282 306 647 093 844 609 550 582 231 725 359 408 128"
         "48 111 745 028 410 270 193 852 110 555 964 462 294 895 493 038 196"
     )
-    NB_BOULES = 60  # nombre total de boules dans l'urne
+    BALL_NUMBER = 60  # nombre total de boules dans l'urne
 
 
 class Subsession(BaseSubsession):
@@ -250,9 +250,9 @@ def get_ball_emoji(color) -> str:
 
 
 # les 3 fonctions suivantes servent à la mise en page des décisions 5-8
-def getLiItems(known: bool) -> list:
+def get_li_items_5_8(known: bool) -> list:
     if known:
-        n = C.NB_BOULES
+        n = C.BALL_NUMBER
         result = [
             f"Urne avec {n} {get_ball_emoji("yellow")} : vous êtes certain de tirer une boule {get_ball_emoji("yellow")}.",
             f"Urne avec {n//2} {get_ball_emoji("yellow")} et {n//2} {get_ball_emoji("purple")} : vous avez 1 chance sur 2 de tirer l’une des 2 couleurs.",
@@ -287,7 +287,7 @@ def getResults(win: bool) -> list:
 def getBoxes(known: bool) -> list:
     n = demi = tier = ""
     if known:
-        n = C.NB_BOULES
+        n = C.BALL_NUMBER
         demi = n // 2
         tier = n // 3
 
@@ -353,6 +353,11 @@ class InvestmentConfirm(Page):
         return getTemplate(player)
 
 
+class InvestmentIntro1_4(Page):
+    def vars_for_template(player: Player):
+        return {"ball_number_per_color": C.BALL_NUMBER // 2} | getTemplate(player)
+
+
 class InvestmentDecision1_4(Page):
     form_model = "player"
 
@@ -362,22 +367,6 @@ class InvestmentDecision1_4(Page):
 
     def vars_for_template(player: Player):
         return getTemplate(player)
-
-
-class InvestmentIntro1(Page):
-    pass
-
-
-class InvestmentIntro2(Page):
-    pass
-
-
-class InvestmentIntro3(Page):
-    pass
-
-
-class InvestmentIntro4(Page):
-    pass
 
 
 class InvestmentDecision5_8(Page):
@@ -408,7 +397,7 @@ class InvestmentDecision5_8(Page):
 
         return getTemplate(player) | {
             "rows": zip(["A", "B", "C", "D"], getBoxes(known), getResults(win)),
-            "li_items": getLiItems(known),
+            "li_items": get_li_items_5_8(known),
         }
 
 
@@ -431,8 +420,7 @@ class Fin(Page):
     # return True
 
     def vars_for_template(player: Player):
-        return {
-            "i_final": player.i_final,
+        return getTemplate(player) | {
             "i_visible": player.i_visible(player.i_final),
             "invested": getattr(player, f"inv{player.i_final}"),
             "ball_color": player.ball_color,
@@ -443,14 +431,6 @@ class Fin(Page):
 
     def before_next_page(player: Player, timeout_happened):
         player.set_participant_vars()
-
-    @staticmethod
-    def app_after_this_page(player: Player, upcoming_apps):
-        index = player.participant.vars["app_index"]
-        if index < 3:
-            app_to_go = player.participant.vars["app_order"][index]
-            player.participant.vars["app_index"] += 1
-            return app_to_go
 
 
 # Création de page_sequence
@@ -463,10 +443,8 @@ page_sequence = [
 
 # Ajoute les décisions 1-4
 
-intros_1_4 = [InvestmentIntro1, InvestmentIntro2, InvestmentIntro3, InvestmentIntro4]
-
-for intro in intros_1_4:
-    page_sequence.extend([intro, InvestmentDecision1_4, InvestmentConfirm])
+for i in range(0, 4):
+    page_sequence.extend([InvestmentIntro1_4, InvestmentDecision1_4, InvestmentConfirm])
 
 # Ajoute les décisions 5-8
 for i in range(0, 4):

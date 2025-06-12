@@ -252,14 +252,6 @@ class Results(Page):
             is_test_round=(player.round_number == 1),
         )
 
-    @staticmethod
-    def app_after_this_page(player: Player, upcoming_apps):
-        index = player.participant.vars["app_index"]
-        if index < 3:
-            app_to_go = player.participant.vars["app_order"][index]
-            player.participant.vars["app_index"] += 1
-            return app_to_go
-
 
 page_sequence = [
     Instructions,
