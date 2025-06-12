@@ -17,12 +17,14 @@
   <p id="kept"></p>
   <strong>Vos jetons après tirage :</strong>
   <ul>
-    <li>🟡 Boule JAUNE : <span id="gains_if_yellow"></span></li>
-    <li>🟣 Boule VIOLETTE : <span id="gains_if_purple"></span></li>
+    <li><span class="ball yellow"></span> Boule JAUNE : <span id="gains_if_yellow"></span></li>
+    <li><span class="ball purple"></span> Boule VIOLETTE : <span id="gains_if_purple"></span></li>
   </ul>
 </div>
 
 {{ next_button }} 
+
+{{ include_sibling 'style.html'}} 
 
 {{ include_sibling 'scripts.html'}} 
 

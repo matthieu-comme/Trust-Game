@@ -5,7 +5,7 @@
 <p>Vous allez maintenant choisir un <strong>tirage au sort parmi plusieurs tirages possibles</strong>.</p>
 <p>
     Chaque tirage correspond à une urne contenant des boules de couleurs
-    différentes : JAUNE 🟡 , VIOLETTE 🟣 ou BLEUE 🔵 {% if i_decision == 6 or
+    différentes : JAUNE <span class="ball yellow"></span> , VIOLETTE <span class="ball purple"></span> ou BLEUE <span class="ball blue"></span> {% if i_decision == 6 or
     i_decision == 8 %} mais vous ne connaissez pas le nombre. {% endif %}<br />
     La couleur tirée détermine le nombre de jetons que vous gagnez.
   </p>
@@ -46,6 +46,8 @@
 {{ endif }}
 
 {{ next_button }} 
+
+{{ include_sibling 'style.html'}} 
 
 <style>
     table, td {

@@ -11,31 +11,33 @@
 
 <p>🔍 Comment fonctionne le jeu risqué ?</p>
 
-<p>Un tirage au sort est effectué dans une urne contenant 12 boules : 6 🟡 jaunes et 6 🟣 violettes</p>
+<p>Un tirage au sort est effectué dans une urne contenant 12 boules : 6 <span class="ball yellow"></span> jaunes et 6 <span class="ball purple"></span> violettes</p>
 
-<img src="https://i.imgur.com/gyd2hhf.png" width="">
+<img src="https://i.imgur.com/CF4Tl4o.png" width="100">
 
-<p>Avec autant de boules 🟡 que 🟣, vous avez 1 chance sur 2 de tirer chaque boule : </p>
+<p>Avec autant de boules <span class="ball yellow"></span> que <span class="ball purple"></span>, vous avez 1 chance sur 2 de tirer chaque boule : </p>
 
 <ul>
-  <li>🟡 tirage JAUNE : vous gagnez 3 fois les jetons investis</li>
-  <li>🟣 tirage VIOLET : vous perdez les jetons investis</li>
+  <li><span class="ball yellow"></span> tirage JAUNE : vous gagnez 3 fois les jetons investis</li>
+  <li><span class="ball purple"></span> tirage VIOLET : vous perdez les jetons investis</li>
 </ul>
 
 <p><strong>Exemple :</strong> Vous investissez 4 jetons (et en gardez 6).</p>
 <ul>
-  <li><strong>🟡 tirage JAUNE :</strong> vous gagnez 3 × 4 jetons = 12 jetons</li>
+  <li><strong><span class="ball yellow"></span> tirage JAUNE :</strong> vous gagnez 3 × 4 jetons = 12 jetons</li>
 
   <ul>
       <li>Votre total : 12 gagnés + 6 gardés = 18 jetons</li>
   </ul>
 
-  <li><strong>🟣 tirage VIOLET :</strong> vous perdez les 4 jetons investis et ne gagnez donc rien</li>
+  <li><strong><span class="ball purple"></span> tirage VIOLET :</strong> vous perdez les 4 jetons investis et ne gagnez donc rien</li>
 
   <ul>
       <li>Vote total : 0 gagné + 6 gardés = 6 jetons</li>
   </ul>
 </ul>
 {{ next_button }} 
+
+{{ include_sibling 'style.html'}} 
 
 {% endblock %}

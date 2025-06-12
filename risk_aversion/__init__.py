@@ -51,22 +51,22 @@ class Player(BasePlayer):
     # Sommes investies à chaque décision
     inv1 = models.IntegerField(
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
-        initial=0,
+        initial=-1,
         label="Je décide d'investir :",
     )
     inv2 = models.IntegerField(
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
-        initial=0,
+        initial=-1,
         label="Je décide d'investir :",
     )
     inv3 = models.IntegerField(
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
-        initial=0,
+        initial=-1,
         label="Je décide d'investir :",
     )
     inv4 = models.IntegerField(
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
-        initial=0,
+        initial=-1,
         label="Je décide d'investir :",
     )
     inv5 = models.StringField(
@@ -244,20 +244,25 @@ def getAbsoluteProfit(invested: str, ball_color: str) -> int:
     return result
 
 
+# retourne la balise pour l'emoji de boule
+def get_ball_emoji(color) -> str:
+    return f"<span class='ball {color}'></span>"
+
+
 # les 3 fonctions suivantes servent à la mise en page des décisions 5-8
 def getLiItems(known: bool) -> list:
     if known:
         n = C.NB_BOULES
         result = [
-            f"Urne avec {n} 🟡 : vous êtes certain de tirer une boule 🟡.",
-            f"Urne avec {n//2} 🟡 et {n//2} 🟣 : vous avez 1 chance sur 2 de tirer l’une des 2 couleurs.",
-            f"Urne avec {n//3} 🟡, {n//3} 🟣 et {n//3} 🔵 : vous avez 1 chance sur 3 de tirer l’une des 3 couleurs.",
+            f"Urne avec {n} {get_ball_emoji("yellow")} : vous êtes certain de tirer une boule {get_ball_emoji("yellow")}.",
+            f"Urne avec {n//2} {get_ball_emoji("yellow")} et {n//2} {get_ball_emoji("purple")} : vous avez 1 chance sur 2 de tirer l’une des 2 couleurs.",
+            f"Urne avec {n//3} {get_ball_emoji("yellow")}, {n//3} {get_ball_emoji("purple")} et {n//3} {get_ball_emoji("blue")} : vous avez 1 chance sur 3 de tirer l’une des 3 couleurs.",
         ]
     else:
         result = [
-            "Urne avec 🟡 : vous êtes certain de tirer une boule 🟡.",
-            "Urne avec 🟡 et 🟣 : vous ne connaissez pas vos chances de tirer chacune des 2 couleurs.",
-            "Urne avec 🟡, 🟣 et 🔵 : vous ne connaissez pas vos chances de tirer chacune des 3 couleurs.",
+            f"Urne avec {get_ball_emoji("yellow")} : vous êtes certain de tirer une boule {get_ball_emoji("yellow")}.",
+            f"Urne avec {get_ball_emoji("yellow")} et {get_ball_emoji("purple")} : vous ne connaissez pas vos chances de tirer chacune des 2 couleurs.",
+            f"Urne avec {get_ball_emoji("yellow")}, {get_ball_emoji("purple")} et {get_ball_emoji("blue")} : vous ne connaissez pas vos chances de tirer chacune des 3 couleurs.",
         ]
     return result
 
@@ -272,9 +277,9 @@ def getResults(win: bool) -> list:
 
     return [
         f"Vous {word} {n} jetons",
-        f"Boule 🟡 → vous {word} {n//2} jetons<br>Boule 🟣→ vous {word} {n*3//2} jetons",
-        f"Boule 🟡 → vous {word} {n//2} jetons<br>Boule 🟣→ vous {word} {n} jetons<br>Boule 🔵 → vous {word} {n*3//2} jetons",
-        f"Boule 🟡 → vous {word} 0 jeton<br>Boule 🟣→ vous {word} {n*2} jetons",
+        f"Boule {get_ball_emoji("yellow")} → vous {word} {n//2} jetons<br>Boule {get_ball_emoji("purple")}→ vous {word} {n*3//2} jetons",
+        f"Boule {get_ball_emoji("yellow")} → vous {word} {n//2} jetons<br>Boule {get_ball_emoji("purple")}→ vous {word} {n} jetons<br>Boule {get_ball_emoji("blue")} → vous {word} {n*3//2} jetons",
+        f"Boule {get_ball_emoji("yellow")} → vous {word} 0 jeton<br>Boule {get_ball_emoji("purple")}→ vous {word} {n*2} jetons",
     ]
 
 
@@ -287,10 +292,10 @@ def getBoxes(known: bool) -> list:
         tier = n // 3
 
     return [
-        f"{n} boules 🟡",
-        f"{demi} boules 🟡<br>{demi} boules 🟣",
-        f"{tier} boules 🟡<br>{tier} boules 🟣<br>{tier} boules 🔵",
-        f"{demi} boules 🟡<br>{demi} boules 🟣",
+        f"{n} boules {get_ball_emoji("yellow")}",
+        f"{demi} boules {get_ball_emoji("yellow")}<br>{demi} boules {get_ball_emoji("purple")}",
+        f"{tier} boules {get_ball_emoji("yellow")}<br>{tier} boules {get_ball_emoji("purple")}<br>{tier} boules {get_ball_emoji("blue")}",
+        f"{demi} boules {get_ball_emoji("yellow")}<br>{demi} boules {get_ball_emoji("purple")}",
     ]
 
 
@@ -307,7 +312,7 @@ class CountDigitTask(Page):
         if values["pi_count"] != correct_count:
             return f"Incorrect. Réessayez."
 
-    def vars_for_template(player):
+    def vars_for_template(player: Player):
         return getTemplate(player) | dict(
             pi_digits=C.PI_DIGITS,
             digit=player.target_digit,
@@ -319,10 +324,9 @@ class CountDigitTask(Page):
 
 class GeneralInfo(Page):
     # Génère aléatoirement le chiffre à compter
-    @staticmethod
-    def before_next_page(player, timeout_happened):
-        pass
-        # player.target_digit = random.randint(0, 9)
+    # @staticmethod
+    # def before_next_page(player: Player, timeout_happened):
+    #    player.target_digit = random.randint(0, 9)
 
     def vars_for_template(player):
         return {
