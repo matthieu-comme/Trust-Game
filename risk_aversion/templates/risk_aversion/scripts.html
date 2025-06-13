@@ -1,7 +1,7 @@
 <script>
-  i_decision = parseInt("{{player.i_decision}}");
+  current_decision = parseInt("{{real_current_decision}}");
   const selectInput = document.querySelector(
-    "select[name=inv" + i_decision + "]"
+    "select[name=inv" + current_decision + "]"
   );
   const max_investment = parseFloat("{{C.MAX_INVESTMENT }}");
   const kept = document.getElementById("kept");
@@ -14,7 +14,7 @@
     kept.innerHTML = updateKept(kept_value);
     let result;
 
-    switch (i_decision) {
+    switch (current_decision) {
       case 1:
       case 2:
         result = update_D1_D2(kept_value, invested);
@@ -32,7 +32,7 @@
   // retourne le message concernant les jetons gardés
   function updateKept(kept_value) {
     let result;
-    if (i_decision == 1 || i_decision == 2) {
+    if (current_decision == 1 || current_decision == 2) {
       result = "-> je garde <strong>" + kept_value + "</strong> jetons";
     } else {
       result =

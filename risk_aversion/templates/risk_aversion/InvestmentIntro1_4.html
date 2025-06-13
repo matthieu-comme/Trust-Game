@@ -1,11 +1,12 @@
-{{ block title }} Investissez vos jetons – Décision {{ player.i_decision }} {{ endblock }} 
+{{ block title }} Investissez vos jetons – Décision {{ player.confirmed_decision_count }} {{ endblock }} 
 
 {% block content %}
 
+<p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
 <p>Avec {{ C.MAX_INVESTMENT }} de <strong>vos</strong> jetons, vous pouvez :</p>
  
 <ul>
-  {{ if player.i_decision == 1 or player.i_decision == 2 }}
+  {{ if real_current_decision == 1 or real_current_decision == 2 }}
 
   <li>💰 tous les <strong>garder</strong></li>
   <li>🎲 ou les <strong>investir en partie ou en totalité</strong> dans un jeu risqué</li>
@@ -23,11 +24,11 @@
 <p>Le résultat du jeu dépend d'un tirage au sort dans une urne contenant <strong>{{ C.BALL_NUMBER }} boules :</strong></p>
 
 <ul>
-  <li><span class="ball yellow"></span> {{ if player.i_decision == 1 or player.i_decision == 3 }} {{ ball_number_per_color }} {{ else }} des {{ endif }} boules <strong>JAUNES</strong></li>
-  <li><span class="ball purple"></span> {{ if player.i_decision == 1 or player.i_decision == 3 }} {{ ball_number_per_color }} {{ else }} des {{ endif }} boules <strong>VIOLETTES</strong></li>
+  <li><span class="ball yellow"></span> {{ if real_current_decision == 1 or real_current_decision == 3 }} {{ ball_number_per_color }} {{ else }} des {{ endif }} boules <strong>JAUNES</strong></li>
+  <li><span class="ball purple"></span> {{ if real_current_decision == 1 or real_current_decision == 3 }} {{ ball_number_per_color }} {{ else }} des {{ endif }} boules <strong>VIOLETTES</strong></li>
 </ul>
 
-{{ if player.i_decision == 1 or player.i_decision == 3 }} 
+{{ if real_current_decision == 1 or real_current_decision == 3 }} 
 
 <p><strong>Vous avez donc 1 chance sur 2 de tirer chaque couleur :</strong></p>
 
@@ -40,7 +41,7 @@
 
 <img src="https://i.imgur.com/CF4Tl4o.png" width="100">
 
-{{ if player.i_decision == 1 or player.i_decision == 2 }} 
+{{ if real_current_decision == 1 or real_current_decision == 2 }} 
 
 <ul>
   <li><span class="ball yellow"></span> tirage <strong>JAUNE</strong> : vous <strong>gagnez 3 fois les jetons investis</strong></li>

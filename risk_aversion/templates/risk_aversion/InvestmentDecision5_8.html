@@ -1,12 +1,12 @@
-{{ block title }} Investissez vos jetons – Décision {{ i_visible }} {{ endblock }} 
+{{ block title }} Investissez vos jetons – Décision {{ player.confirmed_decision_count }} {{ endblock }} 
 {% block content %}
 
-<p>Ceci est en réalité la Décision {{ i_decision }} </p>
+<p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
 <p>Vous allez maintenant choisir un <strong>tirage au sort parmi plusieurs tirages possibles</strong>.</p>
 <p>
     Chaque tirage correspond à une urne contenant des boules de couleurs
-    différentes : JAUNE <span class="ball yellow"></span> , VIOLETTE <span class="ball purple"></span> ou BLEUE <span class="ball blue"></span> {% if i_decision == 6 or
-    i_decision == 8 %} mais vous ne connaissez pas le nombre. {% endif %}<br />
+    différentes : JAUNE <span class="ball yellow"></span> , VIOLETTE <span class="ball purple"></span> ou BLEUE <span class="ball blue"></span> {% if real_current_decision == 6 or
+    real_current_decision == 8 %} mais vous ne connaissez pas le nombre. {% endif %}<br />
     La couleur tirée détermine le nombre de jetons que vous gagnez.
   </p>
   <ul>
@@ -22,6 +22,7 @@
         <th>Option</th>
         <th>Contenu de l'urne</th>
         <th>Résultat du tirage</th>
+        <th>Votre choix</th>
       </tr>
     </thead>
     <tbody>
@@ -30,20 +31,11 @@
         <td>{{ letter }}</td>
         <td>{{ box }}</td>
         <td>{{ result }}</td>
+        <td><input type="radio" name="inv{{ real_current_decision }}" value="{{ letter }}"></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-
-{{ if player.i_decision == 5 }}    
-    {{ formfield 'inv5' }}    
-{{ elif player.i_decision == 6}}
-    {{ formfield 'inv6' }}
-{{ elif player.i_decision == 7}}
-    {{ formfield 'inv7' }}
-{{ elif player.i_decision == 8}}
-    {{ formfield 'inv8' }}
-{{ endif }}
 
 {{ next_button }} 
 

@@ -1,15 +1,16 @@
-{{ block title }} Investissez vos jetons – Décision {{ player.i_decision }} {{ endblock }} 
+{{ block title }} Investissez vos jetons – Décision {{ player.confirmed_decision_count }} {{ endblock }} 
 {{ block content }}
 
+<p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
 <p><strong>Combien souhaitez-vous investir ?</strong></p>
 
-{{ if player.i_decision == 1 }}
+{{ if real_current_decision == 1 }}
     {{ formfield 'inv1' }}
-{{ elif player.i_decision == 2}}
+{{ elif real_current_decision == 2}}
     {{ formfield 'inv2' }}
-{{ elif player.i_decision == 3}}
+{{ elif real_current_decision == 3}}
     {{ formfield 'inv3' }}
-{{ elif player.i_decision == 4}}
+{{ elif real_current_decision == 4}}
     {{ formfield 'inv4' }}
 {{ endif }}
 

@@ -43,10 +43,25 @@ class Player(BasePlayer):
     target_digit = models.IntegerField(initial=0)
     pi_count = models.IntegerField(label="Combien de fois ce chiffre apparaît-il ?")
 
+    # l'ordre des decisions 1 à 8 étant randomisés, ces indices sont ceux correspondant au cahier des charges
+    real_index_1 = models.IntegerField(initial=-1)
+    real_index_2 = models.IntegerField(initial=-1)
+    real_index_3 = models.IntegerField(initial=-1)
+    real_index_4 = models.IntegerField(initial=-1)
+    real_index_5 = models.IntegerField(initial=-1)
+    real_index_6 = models.IntegerField(initial=-1)
+    real_index_7 = models.IntegerField(initial=-1)
+    real_index_8 = models.IntegerField(initial=-1)
+
     # compteur suivant l'avancée dans les decisions
-    i_decision = models.IntegerField(initial=1)
-    # indice de la décision réellement choisie
-    i_final = models.IntegerField(initial=-1)
+    current_decision = models.IntegerField(initial=1)
+
+    confirmed_decision_count = models.IntegerField(initial=1)
+    # indice relatif de la décision tirée au sort
+    chosen_decision = models.IntegerField(initial=-1)
+
+    # indice réel de la décision choisie
+    real_chosen_decision = models.IntegerField(initial=-1)
 
     # Sommes investies à chaque décision
     inv1 = models.IntegerField(
@@ -81,42 +96,73 @@ class Player(BasePlayer):
     inv8 = models.StringField(
         choices=["A", "B", "C", "D"], label="Je choisis le tirage :"
     )
-    chosen_decision = models.IntegerField(
-        initial=0
-    )  # indice relatif de la décision tirée au sort
+
     ball_color = models.StringField(initial="")  # couleur de la boule
     profit = models.CurrencyField(initial=0)  # profit décision
 
-    # retourne le numéro de la décision, prend en compte les décisions non affichées
-    def i_visible(self, indice=None) -> int:
-        i = self.i_decision if indice is None else indice
+    # retourne l'indice réel de décision, conforme au cahier des charges
+    def get_real_index(self, i=None) -> int:
+        if i is None:
+            i = self.current_decision
+        if 1 <= i <= 8:
+            return getattr(self, f"real_index_{i}")
 
-        # Conditions d'affichage des décisions 5 à 8
+    def get_all_real_index(self) -> list:
+        return [getattr(self, f"real_index_{i}") for i in range(1, 9)]
+
+    # opération inverse de la fonction précédente
+    def get_index_from_real(self, real: int):
+        real_index_list = [getattr(self, f"real_index_{i}") for i in range(1, 9)]
+        return real_index_list.index(real) + 1
+
+    # set la correspondance entre l'indice visible et le réel indice
+    def init_real_index(self):
+        index_map = create_index_map()
+        for i in range(1, 9):
+            setattr(self, f"real_index_{i}", index_map[i - 1])
+
+    # retourne vrai si la condition d'apparition de la décision real_index est remplie, faux sinon
+    def condition_met(self, real_index: int) -> bool:
+
+        # conditions d'affichage des décisions 5 à 8
         condition1 = self.inv1 == C.MAX_INVESTMENT
         condition2 = self.inv2 == C.MAX_INVESTMENT
         condition3 = self.inv3 == 0
         condition4 = self.inv4 == 0
-        result = 4  # la décision 4 est la dernière obligatoire
 
-        match i:
+        match real_index:
             case 5:
-                result += condition1
+                result = condition1
             case 6:
-                result += condition1 + condition2
+                result = condition2
             case 7:
-                result += condition1 + condition2 + condition3
+                result = condition3
             case 8:
-                result += condition1 + condition2 + condition3 + condition4
-            case _:
-                result = i
+                result = condition4
+
+        return result
+
+    # retourne l'indice visible par le joueur en prenant en compte celles qui sont masquées par des conditions
+    def get_visible_index(self, indice) -> int:
+        all_real_index = self.get_all_real_index()
+        matching_index = all_real_index.index(indice) + 1
+
+        if indice <= 4:
+            return matching_index
+
+        result = 4  # les 4 premières sont toujours visibles
+
+        for i in range(4, matching_index):
+            if self.condition_met(all_real_index[i]):
+                result += 1
 
         return result
 
     # conserve les infos importantes concernant la décision tirée au sort pour les afficher à la toute fin de l'expérience
     def set_participant_vars(self):
         vars = self.participant.vars
-        vars["i_decision"] = self.i_visible(self.i_final)
-        vars["invested"] = getattr(self, f"inv{self.i_final}")
+        vars["chosen_decision"] = self.chosen_decision
+        vars["invested"] = getattr(self, f"inv{self.real_chosen_decision}")
         vars["ball_color"] = self.ball_color
         vars["profit"] = self.profit
         vars["payoff"] = self.payoff
@@ -125,9 +171,23 @@ class Player(BasePlayer):
 # ----- FONCTIONS -----
 
 
+# crée un ordre aléatoire de décisions. exemple : [4, 1, 3, 2, 7, 5, 8, 6]
+# 1-4 sont première moitié de liste, 5-8 deuxième moitié
+def create_index_map() -> list:
+    liste1 = [1, 2, 3, 4]
+    liste2 = [5, 6, 7, 8]
+
+    random.shuffle(liste1)
+    random.shuffle(liste2)
+
+    return liste1 + liste2
+
+
 # logique d'affichage : vrai si décision 1 à 4, ou respecte les conditions pour 5 à 8, faux sinon
 def display_logic(player: Player) -> bool:
-    i = player.i_decision
+    i = player.get_real_index()
+    if i is None:
+        return False
     max = C.MAX_INVESTMENT
     result = (
         i <= 4
@@ -142,10 +202,13 @@ def display_logic(player: Player) -> bool:
 # utilisée pour debugger
 def getTemplate(player: Player) -> dict:
     return {
+        "confirmed_decision_count": player.confirmed_decision_count,
         "participant.payoff": player.participant.payoff,
-        "i_decision": player.i_decision,
-        "i_visible": player.i_visible(),
-        "i_final": player.i_final,
+        "current_decision": player.current_decision,
+        "real_current_decision": player.get_real_index(),
+        "chosen_decision": player.chosen_decision,
+        "real_chosen_decision": player.real_chosen_decision,
+        "real_index": player.get_all_real_index(),
         "inv1_4": [player.inv1, player.inv2, player.inv3, player.inv4],
         "inv5_8": [
             player.field_maybe_none("inv5"),
@@ -157,7 +220,7 @@ def getTemplate(player: Player) -> dict:
 
 
 # retourne la couleur de la boule tirée au hasard
-def getBallColor(is_blue: bool) -> str:
+def get_ball_color(is_blue: bool) -> str:
     i = random.randint(0, (1 + is_blue))
     if i == 0:
         result = "yellow"
@@ -168,7 +231,7 @@ def getBallColor(is_blue: bool) -> str:
     return result
 
 
-# retourne l'indice de la décision tirée au sort
+# retourne l'indice réel de la décision tirée au sort
 def getFinalDecision(player: Player) -> int:
     decisions = [
         player.inv1,
@@ -181,19 +244,21 @@ def getFinalDecision(player: Player) -> int:
         player.field_maybe_none("inv8"),
     ]
     while True:
-        i = random.randint(0, 7)
-        if decisions[i] is not None:
+        i = random.randint(1, 8)
+        if decisions[i - 1] is not None:
             break
-    return i + 1
+    return i
 
 
 # retourne le profit final
 def finalProfit(player: Player) -> Currency:
-    i = player.i_final = getFinalDecision(player)  # indice de la décision tirée au sort
+
+    i = player.real_chosen_decision = getFinalDecision(player)
+    player.chosen_decision = player.get_visible_index(i)
     invested = getattr(player, f"inv{i}")  # somme investie à cette décision
 
     # tirage de la boule, bleue uniquement présente si tirage = C
-    ball_color = getBallColor(False) if invested != "C" else getBallColor(True)
+    ball_color = get_ball_color(False) if invested != "C" else get_ball_color(True)
     profit = 0
     if i == 1 or i == 2:
         profit = profit_1_2(invested, ball_color)
@@ -215,9 +280,9 @@ def profit_3_4(invested: int, ball_color: str) -> int:
     return -kept if ball_color == "yellow" else -(3 * invested + kept)
 
 
-def profit_5_8(i_decision: int, invested: int, ball_color: str) -> int:
+def profit_5_8(current_decision: int, invested: int, ball_color: str) -> int:
     profit = getAbsoluteProfit(invested, ball_color)  # profit positif si i=5|6
-    if i_decision == 7 or i_decision == 8:  # sinon profit négatif
+    if current_decision == 7 or current_decision == 8:  # sinon profit négatif
         profit *= -1
     return profit
 
@@ -324,18 +389,18 @@ class CountDigitTask(Page):
 
 class GeneralInfo(Page):
     # Génère aléatoirement le chiffre à compter
-    # @staticmethod
-    # def before_next_page(player: Player, timeout_happened):
-    #    player.target_digit = random.randint(0, 9)
-
-    def vars_for_template(player):
-        return {
-            "etape": "la mesure d'aversion au risque et à l'ambiguité",
-        }
+    def before_next_page(player: Player, timeout_happened):
+        player.init_real_index()
+        # player.target_digit = random.randint(0, 9)
 
 
 class TaskSuccess(Page):
-    pass
+
+    def before_next_page(player: Player, timeout_happened):
+        pass
+
+    def vars_for_template(player: Player):
+        return getTemplate(player)
 
 
 class InvestmentConfirm(Page):
@@ -343,11 +408,13 @@ class InvestmentConfirm(Page):
     def is_displayed(player: Player):
         result = display_logic(player)
         if not result:  # incrémente ici car on ne passera pas par before_next_page
-            player.i_decision += 1
+            player.current_decision += 1
         return result
 
     def before_next_page(player: Player, timeout_happened):
-        player.i_decision += 1
+        if player.current_decision <= 8:
+            player.current_decision += 1
+            player.confirmed_decision_count += 1
 
     def vars_for_template(player: Player):
         return getTemplate(player)
@@ -362,7 +429,7 @@ class InvestmentDecision1_4(Page):
     form_model = "player"
 
     def get_form_fields(player: Player):
-        i = str(player.i_decision)
+        i = str(getattr(player, f"real_index_{player.current_decision}"))
         return ["inv" + i]
 
     def vars_for_template(player: Player):
@@ -373,7 +440,7 @@ class InvestmentDecision5_8(Page):
     form_model = "player"
 
     def get_form_fields(player: Player):
-        i = str(player.i_decision)
+        i = str(player.get_real_index())
         return ["inv" + i]
 
     def is_displayed(player: Player):
@@ -381,7 +448,7 @@ class InvestmentDecision5_8(Page):
 
     # pour construire les tableaux
     def vars_for_template(player: Player):
-        match player.i_decision:
+        match player.get_real_index():
             case 5:
                 known = True
                 win = True
@@ -414,15 +481,15 @@ class TirageFinal(Page):
 
 class Fin(Page):
     # pour essayer plusieurs tirages consécutifs
-    # def is_displayed(player: Player):
-    # player.profit = finalProfit(player)
-    # player.payoff += player.profit
-    # return True
+    def is_displayed(player: Player):
+        player.profit = finalProfit(player)
+        player.payoff += player.profit
+        return True
 
     def vars_for_template(player: Player):
         return getTemplate(player) | {
-            "i_visible": player.i_visible(player.i_final),
-            "invested": getattr(player, f"inv{player.i_final}"),
+            "initial_amount": player.payoff - player.profit,
+            "invested": getattr(player, f"inv{player.real_chosen_decision}"),
             "ball_color": player.ball_color,
             "profit": player.profit,
             "payoff": player.payoff,
