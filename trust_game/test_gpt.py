@@ -18,13 +18,21 @@ client = openai.OpenAI(api_key=key)
 messages = [
     {
         "role": "system",
-        "content": "Tu vas répondre en une phrase, conclue par trois points d'exclamation.",
-    }
+        "content": "Tu vas répondre en maximum 2 phrases.",
+    },
+    {
+        "role": "system",
+        "content": "Tu vas répondre en mix de français et d'anglais.",
+    },
+    {
+        "role": "system",
+        "content": "Tu vas conclure chaque réponse par des points de suspension",
+    },
 ]
 print("La discussion commence, écrivez 'STOP' pour l'arrêter")
 
 while True:
-    user_msg = input("Vous: ")
+    user_msg = input("\nVous: ")
     if str.lower(user_msg) == ("stop"):
         break
     # ajout de la demande à l'historique

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{{ block content }}
+
+<h2>Chat avec ChatGPT</h2>
+
+<div id="chat" style="border:1px solid #ccc; padding:1em; height:200px; overflow:auto;"></div>
+<textarea id="userInput"></textarea><br>
+<button onclick="sendMessage()">Envoyer</button>
+
+<script>
+    let messages = [];
+
+    function addMessage(role, content) {
+        messages.push({ role, content });
+        const chatDiv = document.getElementById("chat");
+        chatDiv.innerHTML += `<p><strong>${role}:</strong> ${content}</p>`;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById("userInput");
+        const content = input.value;
+        addMessage("user", content);
+        input.value = "";
+
+        const res = await fetch("http://localhost:5000/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ messages })
+        });
+
+        const data = await res.json();
+        addMessage("assistant", data.reply);
+    }
+</script>
+
+{{ endblock }}

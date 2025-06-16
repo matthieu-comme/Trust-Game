@@ -5,6 +5,9 @@ __pycache__/
 
 *.sqlite3
 
+.env
+node_modules/
+
 test.py
 commit_message.txt
 config.json
