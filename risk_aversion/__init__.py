@@ -367,6 +367,13 @@ def getBoxes(known: bool) -> list:
 # ----- PAGES -----
 
 
+class GeneralInfo(Page):
+    # Génère aléatoirement le chiffre à compter
+    def before_next_page(player: Player, timeout_happened):
+        player.init_real_index()
+        player.target_digit = random.randint(0, 9)
+
+
 class CountDigitTask(Page):
     form_model = "player"
     form_fields = ["pi_count"]
@@ -385,13 +392,6 @@ class CountDigitTask(Page):
 
     def before_next_page(player, timeout_happened):
         player.payoff = C.ENDOWMENT
-
-
-class GeneralInfo(Page):
-    # Génère aléatoirement le chiffre à compter
-    def before_next_page(player: Player, timeout_happened):
-        player.init_real_index()
-        # player.target_digit = random.randint(0, 9)
 
 
 class TaskSuccess(Page):
@@ -481,10 +481,10 @@ class TirageFinal(Page):
 
 class Fin(Page):
     # pour essayer plusieurs tirages consécutifs
-    def is_displayed(player: Player):
-        player.profit = finalProfit(player)
-        player.payoff += player.profit
-        return True
+    # def is_displayed(player: Player):
+    #    player.profit = finalProfit(player)
+    #    player.payoff += player.profit
+    #    return True
 
     def vars_for_template(player: Player):
         return getTemplate(player) | {
