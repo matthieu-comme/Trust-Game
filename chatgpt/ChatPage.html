@@ -1,0 +1,65 @@
+{% block content %}
+
+<div
+  id="chat-box"
+  style="
+    white-space: pre-line;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 1em;
+    height: 300px;
+    overflow-y: auto;
+  "
+>
+  {{ chat_history }}
+</div>
+
+<input
+  id="user-input"
+  type="text"
+  placeholder="Écris ton message..."
+  autocomplete="off"
+  style="width: 80%"
+/>
+<button id="send-button">Envoyer</button>
+
+{{ next_button }}
+
+<script>
+  const input = document.getElementById("user-input");
+  const button = document.getElementById("send-button");
+  const chatBox = document.getElementById("chat-box");
+
+  button.onclick = function () {
+    event.preventDefault(); // empêche le submit
+
+    const message = input.value.trim();
+    if (!message) return;
+
+    chatBox.textContent += `\n{{C.USER_PREFIX}}${message}`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    liveSend({ message: message });
+
+    input.value = "";
+    input.focus();
+  };
+
+  // appelée quand le serveur envoie un message via live_method
+  liveRecv = function (data) {
+    const reply = data.reply;
+
+    chatBox.textContent += `\n{{C.BOT_PREFIX}}${reply}`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+  };
+
+  // envoyer en appuyant sur Entrée
+  input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      button.click();
+      event.preventDefault();
+    }
+  });
+</script>
+
+{% endblock %}

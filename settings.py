@@ -3,10 +3,28 @@ from os import environ
 PLAYERS_PER_GROUP = 20
 SESSION_CONFIGS = [
     dict(
-        name="experiment_randomized",
-        display_name="Expérience randomisée par groupe",
-        num_demo_participants=3 * PLAYERS_PER_GROUP,
-        app_sequence=["dispatcher", "questionnaire", "trust_game", "risk_aversion"],
+        name="chatgpt",
+        display_name="Test ChatGPT",
+        num_demo_participants=2,
+        app_sequence=["chatgpt"],
+    ),
+    dict(
+        name="risk_aversion",
+        display_name="Mesure d'aversion au risque",
+        num_demo_participants=1,
+        app_sequence=["risk_aversion"],
+    ),
+    dict(
+        name="trust_game_test",
+        display_name="Trust Game Classique",
+        num_demo_participants=2,
+        app_sequence=["trust_game"],
+    ),
+    dict(
+        name="test_questionnaire",
+        display_name="Test Questionnaire IA",
+        num_demo_participants=20,
+        app_sequence=["questionnaire"],
     ),
     dict(
         name="dispatcher_2",
@@ -33,22 +51,10 @@ SESSION_CONFIGS = [
         app_sequence=["questionnaire", "trust_game", "risk_aversion"],
     ),
     dict(
-        name="risk_aversion",
-        display_name="Mesure d'aversion au risque",
-        num_demo_participants=1,
-        app_sequence=["risk_aversion"],
-    ),
-    dict(
-        name="trust_game_test",
-        display_name="Trust Game Classique",
-        num_demo_participants=2,
-        app_sequence=["trust_game"],
-    ),
-    dict(
-        name="test_questionnaire",
-        display_name="Test Questionnaire IA",
-        num_demo_participants=20,
-        app_sequence=["questionnaire"],
+        name="experiment_randomized",
+        display_name="Expérience randomisée par groupe",
+        num_demo_participants=3 * PLAYERS_PER_GROUP,
+        app_sequence=["dispatcher", "questionnaire", "trust_game", "risk_aversion"],
     ),
 ]
 
