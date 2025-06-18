@@ -178,12 +178,13 @@ content }}
 
   // Fonction pour désactiver le chat
   function disableChat(is_expired) {
-    // is_expired : boolean = true si temps écoulé, faux sinon
+    // is_expired : boolean = true si temps écoulé, faux si c'est le joueur A qui a envoyé
     document.getElementById("chat_input").disabled = true;
     document.getElementById("send_msg_button").disabled = true;
     document.getElementById("chat_disabled_message").classList.remove("d-none");
-    if (is_expired) placeholder = "Temps écoulé";
-    else placeholder = "Joueur A a pris sa décision";
+    const placeholder = is_expired
+      ? "Temps écoulé"
+      : "Joueur A a pris sa décision";
     document.getElementById("chat_input").placeholder = placeholder;
   }
 
@@ -278,8 +279,40 @@ content }}
 
     // Demander l'historique du chat
     liveSend({ request_chat_history: true });
+
+    updateWhenRefreshingPage();
   });
 
+  //refais les envois en cas de refresh
+  function updateWhenRefreshingPage() {
+    const amount_sent = js_vars.amount_sent;
+    const amount_sent_back = js_vars.amount_sent_back;
+    console.log("amount_sent avant if :" + amount_sent);
+    if (amount_sent != null) {
+      disableChat(false);
+      const data_sent = { status: "sent", amount_sent: amount_sent };
+      const data_received = {
+        status: "received",
+        amount_sent: amount_sent,
+        tripled_amount: amount_sent * js_vars.multiplier,
+      };
+      liveRecv(data_sent);
+      liveRecv(data_received);
+      console.log("sent = " + amount_sent);
+    }
+
+    if (amount_sent_back != null) {
+      const data_complete = {
+        status: "complete",
+        can_proceed: true,
+        amount_sent: amount_sent,
+        amount_sent_back: amount_sent_back,
+        tripled_amount: amount_sent * js_vars.multiplier,
+      };
+      liveRecv(data_complete);
+      console.log("sent_back = " + amount_sent_back);
+    }
+  }
   // Fonctions pour le jeu de confiance
   function sendTokens() {
     const amountInput = document.getElementById("amount_input");

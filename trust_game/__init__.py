@@ -9,7 +9,7 @@ class C(BaseConstants):
     NUM_ROUNDS = 1
     ENDOWMENT = 10  # somme initiale du joueur A
     MULTIPLIER = 3
-    CHAT_DURATION = 120  # 2 min de conversation
+    CHAT_DURATION = 10  # 2 min de conversation
 
 
 class Subsession(BaseSubsession):
@@ -26,8 +26,8 @@ class Group(BaseGroup):
         sent_back = self.amount_sent_back
         tripled = sent * C.MULTIPLIER
 
-        p1 = self.get_player_by_id(1)
-        p2 = self.get_player_by_id(2)
+        p1: Player = self.get_player_by_id(1)
+        p2: Player = self.get_player_by_id(2)
 
         p1.payoff = C.ENDOWMENT - sent + sent_back
         p2.payoff = tripled - sent_back
@@ -224,10 +224,13 @@ class GamePlay(Page):
 
     @staticmethod
     def js_vars(player: Player):
+        group: Group = player.group
         return {
             "id_in_group": player.id_in_group,
             "endowment": C.ENDOWMENT,
             "multiplier": C.MULTIPLIER,
+            "amount_sent": group.field_maybe_none("amount_sent"),
+            "amount_sent_back": group.field_maybe_none("amount_sent_back"),
         }
 
 
@@ -255,7 +258,7 @@ class Results(Page):
 
 page_sequence = [
     Instructions,
-    # QuizExample1,
+    QuizExample1,
     SyncWaitPage,
     GamePlay,
     Results,
