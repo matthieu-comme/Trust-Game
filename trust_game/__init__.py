@@ -1,6 +1,15 @@
 from otree.api import *
+from openai import OpenAI
+import json
 import random
 import time
+
+# récupère la clé openai
+with open("config.json") as f:
+    config = json.load(f)
+
+key = config["OPENAI_API_KEY"]
+client = OpenAI(api_key=key)
 
 
 class C(BaseConstants):
@@ -9,7 +18,9 @@ class C(BaseConstants):
     NUM_ROUNDS = 1
     ENDOWMENT = 10  # somme initiale du joueur A
     MULTIPLIER = 3
-    CHAT_DURATION = 10  # 2 min de conversation
+    CHAT_DURATION = 120  # Temps de conversation en secondes
+    USER_PREFIX = "Joueur: "  # nom du joueur affiché avant son message dans le chat
+    BOT_PREFIX = "GPT: "  # pareil pour gpt
 
 
 class Subsession(BaseSubsession):
@@ -47,6 +58,7 @@ class Player(BasePlayer):
     z = models.IntegerField()
     message = models.LongStringField(blank=True)
     chat_history = models.LongStringField(initial="")
+    gpt_history = models.LongStringField(initial="")
 
 
 class BaseQuiz(Page):
@@ -140,10 +152,53 @@ def handle_chat_message(player: Player, data):
     return None
 
 
+def chat_with_gpt(player: Player, data):
+    user_message = data["message"]
+    # historique sous forme de liste pour la requête
+    messages_list = [
+        {"role": "system", "content": "Tu réponds en une à deux phrases simples."}
+    ]
+    history = player.gpt_history or ""
+
+    # reconstruit messages_list
+    for line in history.strip().split("\n"):
+        if line.startswith(C.USER_PREFIX):  # message de user
+            messages_list.append(
+                {"role": "user", "content": line[len(C.USER_PREFIX) :]}
+            )
+        elif line.startswith(C.BOT_PREFIX):  # message de gpt
+            messages_list.append(
+                {"role": "assistant", "content": line[len(C.BOT_PREFIX) :]}
+            )
+
+    messages_list.append({"role": "user", "content": user_message})
+
+    history += f"\n{C.USER_PREFIX}{user_message}"
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages_list,
+    )
+    bot_reply = response.choices[0].message.content
+
+    history += f"\n{C.BOT_PREFIX}{bot_reply}"
+    player.gpt_history = history
+
+    return {
+        player.id_in_group: {
+            "is_chat_gpt": True,
+            "reply": bot_reply,
+            "gpt_history": history,
+        }
+    }
+
+
 class SyncWaitPage(WaitPage):
 
     def after_all_players_arrive(group: Group):
-        if group.field_maybe_none("expire_time") is None:
+        if (
+            group.field_maybe_none("expire_time") is None
+        ):  # set le compte à rebours du chat
             group.expire_time = time.time() + C.CHAT_DURATION
 
     def vars_for_template(player: Player):
@@ -157,9 +212,14 @@ class SyncWaitPage(WaitPage):
 
 class GamePlay(Page):
 
+    def vars_for_template(player: Player):
+        return {"gpt_history": player.gpt_history}
+
     @staticmethod
     def live_method(player: Player, data):
 
+        if "is_chat_gpt" in data:
+            return chat_with_gpt(player, data)
         if "time_remaining" in data:
             player.time_remaining = data["time_remaining"]
         # Gérer les messages du chat
@@ -258,7 +318,7 @@ class Results(Page):
 
 page_sequence = [
     Instructions,
-    QuizExample1,
+    # QuizExample1,
     SyncWaitPage,
     GamePlay,
     Results,

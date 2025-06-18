@@ -1,7 +1,7 @@
 {% block content %}
 
 <div
-  id="chat-box"
+  id="chatgpt-box"
   style="
     white-space: pre-line;
     border: 1px solid #ccc;
@@ -11,24 +11,24 @@
     overflow-y: auto;
   "
 >
-  {{ chat_history }}
+  {{ gpt_history }}
 </div>
 
 <input
-  id="user-input"
+  id="user-gpt-input"
   type="text"
   placeholder="Écris ton message..."
   autocomplete="off"
   style="width: 80%"
 />
-<button id="send-button">Envoyer</button>
+<button id="send-gpt-button">Envoyer</button>
 
 {{ next_button }}
 
 <script>
-  const input = document.getElementById("user-input");
-  const button = document.getElementById("send-button");
-  const chatBox = document.getElementById("chat-box");
+  const input = document.getElementById("user-gpt-input");
+  const button = document.getElementById("send-gpt-button");
+  const chatBox = document.getElementById("chatgpt-box");
 
   button.onclick = function () {
     event.preventDefault(); // empêche le submit

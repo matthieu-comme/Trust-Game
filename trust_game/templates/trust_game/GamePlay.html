@@ -2,6 +2,29 @@
 {% else %} Joueur B - Jeu de Confiance {% endif %} {{ endblock }} {{ block
 content }}
 
+<div
+  id="chatgpt-box"
+  style="
+    white-space: pre-line;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 1em;
+    height: 300px;
+    overflow-y: auto;
+  "
+>
+  {{ gpt_history }}
+</div>
+
+<input
+  id="user-gpt-input"
+  type="text"
+  placeholder="Écris ton message..."
+  autocomplete="off"
+  style="width: 80%"
+/>
+<button id="send-gpt-button">Envoyer</button>
+
 <div class="container">
   <div class="row">
     <!-- Section chat avec timer -->
@@ -149,7 +172,36 @@ content }}
 
 {{ endblock }} {{ block scripts }}
 <script>
-  // Variables globales
+  // ----- Partie ChatGPT -----
+
+  const inputGPT = document.getElementById("user-gpt-input");
+  const buttonGPT = document.getElementById("send-gpt-button");
+  const chatBoxGPT = document.getElementById("chatgpt-box");
+
+  buttonGPT.onclick = function () {
+    event.preventDefault(); // empêche le submit
+
+    const message = inputGPT.value.trim();
+    if (!message) return;
+
+    chatBoxGPT.textContent += `\n{{C.USER_PREFIX}}${message}`;
+    chatBoxGPT.scrollTop = chatBoxGPT.scrollHeight;
+
+    liveSend({ message: message, is_chat_gpt: true });
+
+    inputGPT.value = "";
+    inputGPT.focus();
+  };
+
+  // envoyer en appuyant sur Entrée
+  inputGPT.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      buttonGPT.click();
+      event.preventDefault();
+    }
+  });
+
+  // ----- Partie chat entre joueurs -----
   let expireTime = parseFloat("{{ group.expire_time }}");
   let timeRemaining;
   let chatTimer;
@@ -157,7 +209,6 @@ content }}
   let isTyping = false;
   const doneTypingInterval = 1000;
   const roleIsPlayerA = js_vars.id_in_group === 1;
-  let gameCompleted = false;
   let canProceed = false;
 
   // Fonction pour mettre à jour le timer du chat
@@ -181,11 +232,14 @@ content }}
     // is_expired : boolean = true si temps écoulé, faux si c'est le joueur A qui a envoyé
     document.getElementById("chat_input").disabled = true;
     document.getElementById("send_msg_button").disabled = true;
+    inputGPT.disabled = true;
+    buttonGPT.disabled = true;
     document.getElementById("chat_disabled_message").classList.remove("d-none");
     const placeholder = is_expired
       ? "Temps écoulé"
       : "Joueur A a pris sa décision";
     document.getElementById("chat_input").placeholder = placeholder;
+    inputGPT.placeholder = placeholder;
   }
 
   // Fonction pour envoyer un message
@@ -379,6 +433,13 @@ content }}
   // Gestion des messages live
   function liveRecv(data) {
     // Mise à jour du chat
+
+    if (data.is_chat_gpt == true) {
+      const reply = data.reply;
+
+      chatBoxGPT.textContent += `\n{{C.BOT_PREFIX}}${reply}`;
+      chatBoxGPT.scrollTop = chatBoxGPT.scrollHeight;
+    }
     if (data.new_message || data.full_chat) {
       const chatHistory = document.getElementById("chat_history");
 
@@ -429,7 +490,6 @@ content }}
     }
 
     if (data.status === "complete") {
-      gameCompleted = true;
       canProceed = data.can_proceed;
       document.getElementById("game_results").classList.remove("d-none");
 

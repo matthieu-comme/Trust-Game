@@ -27,7 +27,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    chat_history = models.LongStringField(initial="")  # texte concaténé
+    gpt_history = models.LongStringField(initial="")  # texte concaténé
 
 
 def chat_with_gpt(player: Player, data):
@@ -36,7 +36,7 @@ def chat_with_gpt(player: Player, data):
     messages_list = [
         {"role": "system", "content": "Tu réponds en une à deux phrases simples."}
     ]
-    history = player.chat_history or ""
+    history = player.gpt_history or ""
 
     # reconstruit messages_list
     for line in history.strip().split("\n"):
@@ -60,9 +60,9 @@ def chat_with_gpt(player: Player, data):
     bot_reply = response.choices[0].message.content
 
     history += f"\n{C.BOT_PREFIX}{bot_reply}"
-    player.chat_history = history
+    player.gpt_history = history
 
-    return {player.id_in_group: {"reply": bot_reply, "chat_history": history}}
+    return {player.id_in_group: {"reply": bot_reply, "gpt_history": history}}
 
 
 # PAGES
@@ -71,7 +71,7 @@ class ChatPage(Page):
     live_method = "chat_with_gpt"
 
     def vars_for_template(player: Player):
-        return {"chat_history": player.chat_history}
+        return {"gpt_history": player.gpt_history}
 
 
 page_sequence = [ChatPage]
