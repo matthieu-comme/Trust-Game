@@ -13,7 +13,7 @@ client = OpenAI(api_key=key)
 
 
 class C(BaseConstants):
-    NAME_IN_URL = "trust_game"
+    NAME_IN_URL = "tg"
     PLAYERS_PER_GROUP = 2
     NUM_ROUNDS = 1
     ENDOWMENT = 10  # somme initiale du joueur A
@@ -155,7 +155,7 @@ def handle_chat_message(player: Player, data):
 def chat_with_gpt(player: Player, data):
     user_message = data["message"]
     # historique sous forme de liste pour la requête
-    messages_list = [
+    messages_list = [  # c'est ici qu'on met les consignes pour chatgpt
         {"role": "system", "content": "Tu réponds en une à deux phrases simples."}
     ]
     history = player.gpt_history or ""

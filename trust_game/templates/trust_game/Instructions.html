@@ -1,11 +1,13 @@
-{% extends "global/Page.html" %} {% block content %}
+{% extends "global/Page.html" %}
+{{ block title }} Instructions {{ endblock }}
+{% block content %}
 
 <h2>Instructions</h2>
 
 <p>Ce jeu se joue à deux personnes : un joueur A et un joueur B.</p>
 
 <ul>
-  <li>Le joueur A reçoit 10 jetons.</li>
+  <li>Le joueur A reçoit {{ C.ENDOWMENT }} jetons.</li>
   <li>Il peut en envoyer une partie ou la totalité au joueur B.</li>
   <li>Les jetons envoyés sont triplés lorsqu’ils arrivent chez le joueur B.</li>
   <li>Le joueur B décide ensuite combien il souhaite renvoyer au joueur A.</li>
