@@ -59,6 +59,21 @@ class Player(BasePlayer):
     message = models.LongStringField(blank=True)
     chat_history = models.LongStringField(initial="")
     gpt_history = models.LongStringField(initial="")
+    gpt_behavior = models.StringField(initial="Boruto")  # comportement du bot
+    # = vrai si discussion avec l'autre joueur activée
+    has_cheap_talk = models.BooleanField()
+
+
+# FAIRE LE DISPATCH DES CHEAP TALK / GPT
+def set_gpt_behavior(player: Player):
+    behaviors = ["Neutre", "Stratège", "Altruiste", "Non"]
+    total_participants = len(player.session.get_participants())
+    id = player.participant.id_in_session
+    index = ((id - 1) // 2) % 4
+    player.gpt_behavior = behaviors[index]
+
+    # la première moitié des joueurs ont le cheap talk
+    player.has_cheap_talk = id <= total_participants // 2
 
 
 class BaseQuiz(Page):
@@ -122,7 +137,16 @@ class QuizExample1(BaseQuiz):
 
 
 class Instructions(Page):
-    pass
+
+    def vars_for_template(player: Player):
+        set_gpt_behavior(player)
+        return {
+            "gpt behavior": player.gpt_behavior,
+            "has cheap talk": player.has_cheap_talk,
+        }
+
+    # def before_next_page(player: Player, timeout_happened):
+    #    set_gpt_behavior(player)
 
 
 # Méthode commune pour gérer les messages du chat
@@ -156,7 +180,8 @@ def chat_with_gpt(player: Player, data):
     user_message = data["message"]
     # historique sous forme de liste pour la requête
     messages_list = [  # c'est ici qu'on met les consignes pour chatgpt
-        {"role": "system", "content": "Tu réponds en une à deux phrases simples."}
+        {"role": "system", "content": "Tu réponds en une à deux phrases simples."},
+        {"role": "system", "content": f"Tu vas me parler de {player.gpt_behavior}"},
     ]
     history = player.gpt_history or ""
 
@@ -220,8 +245,7 @@ class GamePlay(Page):
 
         if "is_chat_gpt" in data:
             return chat_with_gpt(player, data)
-        if "time_remaining" in data:
-            player.time_remaining = data["time_remaining"]
+
         # Gérer les messages du chat
         if "message" in data:
             return handle_chat_message(player, data)

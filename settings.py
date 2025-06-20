@@ -1,6 +1,6 @@
 from os import environ
 
-PLAYERS_PER_GROUP = 20
+PLAYERS_PER_GROUP = 16  # 8 traitements, 2 joueurs par groupe
 SESSION_CONFIGS = [
     dict(
         name="chatgpt",
@@ -17,7 +17,7 @@ SESSION_CONFIGS = [
     dict(
         name="trust_game_test",
         display_name="Trust Game Classique",
-        num_demo_participants=2,
+        num_demo_participants=PLAYERS_PER_GROUP,
         app_sequence=["trust_game"],
     ),
     dict(

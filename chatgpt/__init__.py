@@ -28,13 +28,16 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     gpt_history = models.LongStringField(initial="")  # texte concaténé
+    gpt_behavior = models.StringField(initial="Boruto")  # comportement du bot
 
 
 def chat_with_gpt(player: Player, data):
+    # player.gpt_behavior = "One Piece"
     user_message = data["message"]
     # historique sous forme de liste pour la requête
     messages_list = [
-        {"role": "system", "content": "Tu réponds en une à deux phrases simples."}
+        {"role": "system", "content": "Tu réponds en une à deux phrases simples."},
+        {"role": "system", "content": f"Tu vas me parler de {player.gpt_behavior}"},
     ]
     history = player.gpt_history or ""
 

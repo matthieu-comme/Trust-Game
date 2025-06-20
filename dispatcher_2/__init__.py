@@ -5,12 +5,19 @@ from bs4 import BeautifulSoup
 
 class C(BaseConstants):
     NAME_IN_URL = "dispatcher_2"
-    PLAYERS_PER_GROUP = 60
+    PLAYERS_PER_GROUP = 16
     NUM_ROUNDS = 1
     NUM_APPS = 3
     BASE_URL = "http://localhost:8000"
     USERNAME = "admin"
     PASSWORD = "admin"
+    PERMUTATIONS = [
+        # ("trust_game", "questionnaire", "risk_aversion"), permutation test tg
+        ("risk_aversion", "trust_game", "questionnaire"),
+        # ("questionnaire", "risk_aversion", "trust_game"), # Groupe 1
+        ("risk_aversion", "questionnaire", "trust_game"),  # Groupe 2
+        ("questionnaire", "trust_game", "risk_aversion"),  # Groupe 3
+    ]
 
 
 class Subsession(BaseSubsession):
@@ -55,7 +62,11 @@ class Welcome(Page):
     """Page de bienvenue avant le dispatcher"""
 
     def vars_for_template(player: Player):
-        return {"perm": C.PERMUTATIONS}
+        return {
+            "total_participants": len(player.session.get_participants()),
+            "total_players": len(player.subsession.get_players()),
+            "players_in_group": len(player.group.get_players()),
+        }  # {"perm": C.PERMUTATIONS}
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):

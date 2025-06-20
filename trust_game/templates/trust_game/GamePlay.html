@@ -7,53 +7,88 @@ content }}
     <!-- Section chat avec timer -->
     <div class="col-md-12 mb-4">
       <h4><span id="time_remaining">120</span>s restantes</h4>
-      <div id="chat-container" style="display: flex; justify-content: space-between;">
-        <div class="card" style="width: 48%;">
+      <div
+        id="chat-container"
+        style="display: flex; justify-content: space-between"
+      >
+        {{ if player.has_cheap_talk }}
+
+        <div class="card" style="width: 48%">
           <div class="card-header">
             <h4>Discussion avec l'autre joueur</h4>
           </div>
           <div class="card-body">
-            <div id="chat_history" class="border p-2 mb-3" style="height: 200px; overflow-y: auto"></div>
+            <div
+              id="chat_history"
+              class="border p-2 mb-3"
+              style="height: 200px; overflow-y: auto"
+            ></div>
             <div id="typing_indicator" class="text-muted small mb-2 d-none">
               <i>L'autre joueur est en train d'écrire...</i>
             </div>
             <form id="chat_form" onsubmit="return false;">
               <div class="input-group">
-                <input type="text" id="chat_input" class="form-control" placeholder="Parler à l'autre joueur..."
-                  disabled />
-                <button id="send_msg_button" class="btn btn-outline-secondary" type="button" disabled>
+                <input
+                  type="text"
+                  id="chat_input"
+                  class="form-control"
+                  placeholder="Parler à l'autre joueur..."
+                  disabled
+                />
+                <button
+                  id="send_msg_button"
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  disabled
+                >
                   Envoyer
                 </button>
               </div>
             </form>
           </div>
         </div>
-        <div class="card" style="width: 48%;">
+
+        {{ endif }} {{ if player.gpt_behavior != "Non" }}
+        <div class="card" style="width: 48%">
           <div class="card-header">
             <h4>Discussion avec ChatGPT</h4>
           </div>
           <div class="card-body">
-            <div id="chatgpt-box" class="border p-2 mb-3" style="height: 200px; overflow-y: auto">
+            <div
+              id="chatgpt-box"
+              class="border p-2 mb-3"
+              style="height: 200px; overflow-y: auto"
+            >
               {{ gpt_history }}
             </div>
             <form id="gpt-form" onsubmit="return false;">
               <div class="input-group">
-                <input id="user-gpt-input" class="form-control" type="text" placeholder="Parler à ChatGPT..."
-                  autocomplete="off" />
-                <button id="send-gpt-button" class="btn btn-outline-secondary">Envoyer</button>
+                <input
+                  id="user-gpt-input"
+                  class="form-control"
+                  type="text"
+                  placeholder="Parler à ChatGPT..."
+                  autocomplete="off"
+                />
+                <button id="send-gpt-button" class="btn btn-outline-secondary">
+                  Envoyer
+                </button>
               </div>
             </form>
           </div>
         </div>
+        {{ endif }}
       </div>
       <div id="chat_disabled_message" class="text-muted small mt-2 d-none">
         Le temps de discussion est écoulé.
       </div>
+      {{ if player.gpt_behavior != "Non" or player.has_cheap_talk }}
       <div class="alert alert-info mt-3">
-        <strong>Note:</strong> Vous pouvez prendre votre décision avant ou
-        après la fin du temps de communication. Il n'est pas nécessaire
-        d'envoyer un message pour jouer.
+        <strong>Note:</strong> Vous pouvez prendre votre décision avant ou après
+        la fin du temps de communication. Il n'est pas nécessaire d'envoyer un
+        message pour jouer.
       </div>
+      {{ endif }}
     </div>
 
     <!-- Section principale du jeu -->
@@ -75,8 +110,15 @@ content }}
               <p>Vous avez {{ C.ENDOWMENT }} jetons.</p>
               <p>Combien souhaitez-vous envoyer au Joueur B?</p>
               <div class="form-group mb-3">
-                <input type="number" id="amount_input" class="form-control" min="0" max="{{ C.ENDOWMENT }}" step="1"
-                  required />
+                <input
+                  type="number"
+                  id="amount_input"
+                  class="form-control"
+                  min="0"
+                  max="{{ C.ENDOWMENT }}"
+                  step="1"
+                  required
+                />
                 <div class="invalid-feedback">
                   Veuillez entrer un montant entre 0 et {{ C.ENDOWMENT }}.
                 </div>
@@ -106,15 +148,28 @@ content }}
                   Ce montant a été multiplié par {{ C.MULTIPLIER }}, vous avez
                   donc reçu <span id="tripled_amount_1"></span> jetons.
                 </p>
-                <p>Combien souhaitez-vous renvoyer au Joueur A? (entre 0 et <span id="tripled_amount_2"></span> jetons)
+                <p>
+                  Combien souhaitez-vous renvoyer au Joueur A? (entre 0 et
+                  <span id="tripled_amount_2"></span> jetons)
                 </p>
                 <div class="form-group mb-3">
-                  <input type="number" id="amount_back_input" class="form-control" min="0" step="1" required />
+                  <input
+                    type="number"
+                    id="amount_back_input"
+                    class="form-control"
+                    min="0"
+                    step="1"
+                    required
+                  />
                   <div class="invalid-feedback">
                     Veuillez entrer un montant valide.
                   </div>
                 </div>
-                <button id="send_back_button" class="btn btn-primary" type="button">
+                <button
+                  id="send_back_button"
+                  class="btn btn-primary"
+                  type="button"
+                >
                   Renvoyer
                 </button>
               </div>
@@ -138,34 +193,38 @@ content }}
 
 {{ endblock }} {{ block scripts }}
 <script>
-  // ----- Partie ChatGPT -----
-
+  const has_chat_gpt = "{{player.gpt_behavior}}" != "Non";
+  const has_cheap_talk = "{{player.has_cheap_talk}}" == "True";
+  console.log("cheap talk: " + has_cheap_talk + " et gpt: " + has_chat_gpt);
   const inputGPT = document.getElementById("user-gpt-input");
   const buttonGPT = document.getElementById("send-gpt-button");
   const chatBoxGPT = document.getElementById("chatgpt-box");
 
-  buttonGPT.onclick = function () {
-    event.preventDefault(); // empêche le submit
+  // ----- Partie ChatGPT -----
+  if (has_chat_gpt) {
+    buttonGPT.onclick = function () {
+      event.preventDefault(); // empêche le submit
 
-    const message = inputGPT.value.trim();
-    if (!message) return;
+      const message = inputGPT.value.trim();
+      if (!message) return;
 
-    chatBoxGPT.innerText += `\n{{C.USER_PREFIX}}${message}`;
-    chatBoxGPT.scrollTop = chatBoxGPT.scrollHeight;
+      chatBoxGPT.innerText += `\n{{C.USER_PREFIX}}${message}`;
+      chatBoxGPT.scrollTop = chatBoxGPT.scrollHeight;
 
-    liveSend({ message: message, is_chat_gpt: true });
+      liveSend({ message: message, is_chat_gpt: true });
 
-    inputGPT.value = "";
-    inputGPT.focus();
-  };
+      inputGPT.value = "";
+      inputGPT.focus();
+    };
 
-  // envoyer en appuyant sur Entrée
-  inputGPT.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-      buttonGPT.click();
-      event.preventDefault();
-    }
-  });
+    // envoyer en appuyant sur Entrée
+    inputGPT.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        buttonGPT.click();
+        event.preventDefault();
+      }
+    });
+  }
 
   // ----- Partie chat entre joueurs -----
   let expireTime = parseFloat("{{ group.expire_time }}");
@@ -196,16 +255,22 @@ content }}
   // Fonction pour désactiver le chat
   function disableChat(is_expired) {
     // is_expired : boolean = true si temps écoulé, faux si c'est le joueur A qui a envoyé
-    document.getElementById("chat_input").disabled = true;
-    document.getElementById("send_msg_button").disabled = true;
-    inputGPT.disabled = true;
-    buttonGPT.disabled = true;
-    document.getElementById("chat_disabled_message").classList.remove("d-none");
     const placeholder = is_expired
       ? "Temps écoulé"
       : "Joueur A a pris sa décision";
-    document.getElementById("chat_input").placeholder = placeholder;
-    inputGPT.placeholder = placeholder;
+    if (has_cheap_talk) {
+      document.getElementById("chat_input").disabled = true;
+      document.getElementById("send_msg_button").disabled = true;
+      document
+        .getElementById("chat_disabled_message")
+        .classList.remove("d-none");
+      document.getElementById("chat_input").placeholder = placeholder;
+    }
+    if (has_chat_gpt) {
+      inputGPT.disabled = true;
+      buttonGPT.disabled = true;
+      inputGPT.placeholder = placeholder;
+    }
   }
 
   // Fonction pour envoyer un message
@@ -242,43 +307,47 @@ content }}
   // Initialisation lorsque la page est chargée
   document.addEventListener("DOMContentLoaded", function () {
     // Activer le chat
-    document.getElementById("chat_input").disabled = false;
-    document.getElementById("send_msg_button").disabled = false;
+    if (has_cheap_talk) {
+      document.getElementById("chat_input").disabled = false;
+      document.getElementById("send_msg_button").disabled = false;
+    }
 
     // Démarrer le timer
     chatTimer = setInterval(updateChatTimer, 1000);
 
     // Configurer les événements du chat
-    document
-      .getElementById("send_msg_button")
-      .addEventListener("click", function (e) {
-        e.preventDefault(); // Empêcher le comportement par défaut qui pourrait causer un défilement
-        sendChatMessage();
+    if (has_cheap_talk) {
+      document
+        .getElementById("send_msg_button")
+        .addEventListener("click", function (e) {
+          e.preventDefault(); // Empêcher le comportement par défaut qui pourrait causer un défilement
+          sendChatMessage();
+        });
+
+      const chatInput = document.getElementById("chat_input");
+      chatInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+          sendChatMessage();
+          return;
+        }
+
+        if (!isTyping && timeRemaining > 0) {
+          isTyping = true;
+          liveSend({ typing_status: true });
+        }
+
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
       });
 
-    const chatInput = document.getElementById("chat_input");
-    chatInput.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault(); // Empêcher le comportement par défaut du formulaire
-        sendChatMessage();
-        return;
-      }
-
-      if (!isTyping && timeRemaining > 0) {
-        isTyping = true;
-        liveSend({ typing_status: true });
-      }
-
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(doneTyping, doneTypingInterval);
-    });
-
-    chatInput.addEventListener("blur", function () {
-      clearTimeout(typingTimer);
-      if (isTyping) {
-        doneTyping();
-      }
-    });
+      chatInput.addEventListener("blur", function () {
+        clearTimeout(typingTimer);
+        if (isTyping) {
+          doneTyping();
+        }
+      });
+    }
 
     // Configurer les événements du jeu
     if (roleIsPlayerA) {
@@ -307,7 +376,6 @@ content }}
   function updateWhenRefreshingPage() {
     const amount_sent = js_vars.amount_sent;
     const amount_sent_back = js_vars.amount_sent_back;
-    console.log("amount_sent avant if :" + amount_sent);
     if (amount_sent != null) {
       disableChat(false);
       const data_sent = { status: "sent", amount_sent: amount_sent };
@@ -318,7 +386,6 @@ content }}
       };
       liveRecv(data_sent);
       liveRecv(data_received);
-      console.log("sent = " + amount_sent);
     }
 
     if (amount_sent_back != null) {
@@ -330,7 +397,6 @@ content }}
         tripled_amount: amount_sent * js_vars.multiplier,
       };
       liveRecv(data_complete);
-      console.log("sent_back = " + amount_sent_back);
     }
   }
   // Fonctions pour le jeu de confiance
