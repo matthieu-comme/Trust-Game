@@ -6,11 +6,9 @@ content }}
   <div class="row">
     <!-- Section chat avec timer -->
     <div class="col-md-12 mb-4">
-      <h4><span id="time_remaining">120</span>s restantes</h4>
-      <div
-        id="chat-container"
-        style="display: flex; justify-content: space-between"
-      >
+      <h4><span id="time_remaining">{{ C.CHAT_DURATION }}</span>s restantes</h4>
+      <div id="chat-container" style="display: flex; justify-content: space-between">
+
         {{ if player.has_cheap_talk }}
 
         <div class="card" style="width: 48%">
@@ -18,29 +16,17 @@ content }}
             <h4>Discussion avec l'autre joueur</h4>
           </div>
           <div class="card-body">
-            <div
-              id="chat_history"
-              class="border p-2 mb-3"
-              style="height: 200px; overflow-y: auto"
-            ></div>
+            <div id="chat_history" class="border p-2 mb-3" style="height: 200px; overflow-y: auto">
+              {{ chat_history }}
+            </div>
             <div id="typing_indicator" class="text-muted small mb-2 d-none">
               <i>L'autre joueur est en train d'écrire...</i>
             </div>
             <form id="chat_form" onsubmit="return false;">
               <div class="input-group">
-                <input
-                  type="text"
-                  id="chat_input"
-                  class="form-control"
-                  placeholder="Parler à l'autre joueur..."
-                  disabled
-                />
-                <button
-                  id="send_msg_button"
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  disabled
-                >
+                <input type="text" id="chat_input" class="form-control" placeholder="Parler à l'autre joueur..."
+                  disabled />
+                <button id="send_msg_button" class="btn btn-outline-secondary" type="button" disabled>
                   Envoyer
                 </button>
               </div>
@@ -48,28 +34,21 @@ content }}
           </div>
         </div>
 
-        {{ endif }} {{ if player.gpt_behavior != "Non" }}
+        {{ endif }}
+
+        {{ if has_chat_gpt }}
         <div class="card" style="width: 48%">
           <div class="card-header">
             <h4>Discussion avec ChatGPT</h4>
           </div>
           <div class="card-body">
-            <div
-              id="chatgpt-box"
-              class="border p-2 mb-3"
-              style="height: 200px; overflow-y: auto"
-            >
+            <div id="chatgpt-box" class="border p-2 mb-3" style="height: 200px; overflow-y: auto">
               {{ gpt_history }}
             </div>
             <form id="gpt-form" onsubmit="return false;">
               <div class="input-group">
-                <input
-                  id="user-gpt-input"
-                  class="form-control"
-                  type="text"
-                  placeholder="Parler à ChatGPT..."
-                  autocomplete="off"
-                />
+                <input id="user-gpt-input" class="form-control" type="text" placeholder="Parler à ChatGPT..."
+                  autocomplete="off" />
                 <button id="send-gpt-button" class="btn btn-outline-secondary">
                   Envoyer
                 </button>
@@ -79,10 +58,7 @@ content }}
         </div>
         {{ endif }}
       </div>
-      <div id="chat_disabled_message" class="text-muted small mt-2 d-none">
-        Le temps de discussion est écoulé.
-      </div>
-      {{ if player.gpt_behavior != "Non" or player.has_cheap_talk }}
+      {{ if has_chat_gpt or player.has_cheap_talk }}
       <div class="alert alert-info mt-3">
         <strong>Note:</strong> Vous pouvez prendre votre décision avant ou après
         la fin du temps de communication. Il n'est pas nécessaire d'envoyer un
@@ -110,15 +86,8 @@ content }}
               <p>Vous avez {{ C.ENDOWMENT }} jetons.</p>
               <p>Combien souhaitez-vous envoyer au Joueur B?</p>
               <div class="form-group mb-3">
-                <input
-                  type="number"
-                  id="amount_input"
-                  class="form-control"
-                  min="0"
-                  max="{{ C.ENDOWMENT }}"
-                  step="1"
-                  required
-                />
+                <input type="number" id="amount_input" class="form-control" min="0" max="{{ C.ENDOWMENT }}" step="1"
+                  required />
                 <div class="invalid-feedback">
                   Veuillez entrer un montant entre 0 et {{ C.ENDOWMENT }}.
                 </div>
@@ -153,23 +122,12 @@ content }}
                   <span id="tripled_amount_2"></span> jetons)
                 </p>
                 <div class="form-group mb-3">
-                  <input
-                    type="number"
-                    id="amount_back_input"
-                    class="form-control"
-                    min="0"
-                    step="1"
-                    required
-                  />
+                  <input type="number" id="amount_back_input" class="form-control" min="0" step="1" required />
                   <div class="invalid-feedback">
                     Veuillez entrer un montant valide.
                   </div>
                 </div>
-                <button
-                  id="send_back_button"
-                  class="btn btn-primary"
-                  type="button"
-                >
+                <button id="send_back_button" class="btn btn-primary" type="button">
                   Renvoyer
                 </button>
               </div>
@@ -193,38 +151,100 @@ content }}
 
 {{ endblock }} {{ block scripts }}
 <script>
-  const has_chat_gpt = "{{player.gpt_behavior}}" != "Non";
+  const has_chat_gpt = "{{ has_chat_gpt }}" == "True";
   const has_cheap_talk = "{{player.has_cheap_talk}}" == "True";
-  console.log("cheap talk: " + has_cheap_talk + " et gpt: " + has_chat_gpt);
-  const inputGPT = document.getElementById("user-gpt-input");
-  const buttonGPT = document.getElementById("send-gpt-button");
-  const chatBoxGPT = document.getElementById("chatgpt-box");
 
-  // ----- Partie ChatGPT -----
-  if (has_chat_gpt) {
-    buttonGPT.onclick = function () {
-      event.preventDefault(); // empêche le submit
+  let inputCheapTalk;
+  let buttonCheapTalk;
+  let inputGPT;
+  let buttonGPT;
+  let chatBoxGPT;
 
-      const message = inputGPT.value.trim();
-      if (!message) return;
+  // Initialisation lorsque la page est chargée
+  document.addEventListener("DOMContentLoaded", function () {
+    inputCheapTalk = document.getElementById("chat_input");
+    buttonCheapTalk = document.getElementById("send_msg_button");
 
-      chatBoxGPT.innerText += `\n{{C.USER_PREFIX}}${message}`;
-      chatBoxGPT.scrollTop = chatBoxGPT.scrollHeight;
+    inputGPT = document.getElementById("user-gpt-input");
+    buttonGPT = document.getElementById("send-gpt-button");
+    chatBoxGPT = document.getElementById("chatgpt-box");
 
-      liveSend({ message: message, is_chat_gpt: true });
+    // Démarrer le timer
+    chatTimer = setInterval(updateChatTimer, 1000);
 
-      inputGPT.value = "";
-      inputGPT.focus();
-    };
+    // Configurer les événements du chat
+    if (has_cheap_talk) {
+      inputCheapTalk.disabled = false;
+      buttonCheapTalk.disabled = false;
+      buttonCheapTalk.addEventListener("click", function (e) {
+        e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+        sendChatMessage(inputCheapTalk, true);
+      });
 
-    // envoyer en appuyant sur Entrée
-    inputGPT.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        buttonGPT.click();
-        event.preventDefault();
-      }
-    });
-  }
+      inputCheapTalk.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          sendChatMessage(inputCheapTalk, true);
+          return;
+        }
+
+        if (!isTyping && timeRemaining > 0) {
+          isTyping = true;
+          liveSend({ typing_status: true });
+        }
+
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(doneTyping, doneTypingInterval);
+      });
+
+      inputCheapTalk.addEventListener("blur", function () {
+        clearTimeout(typingTimer);
+        if (isTyping) {
+          doneTyping();
+        }
+      });
+    }
+
+    // Configurer les événements du jeu
+    if (roleIsPlayerA) {
+      document
+        .getElementById("send_button")
+        .addEventListener("click", sendTokens);
+    } else {
+      document
+        .getElementById("send_back_button")
+        .addEventListener("click", sendTokensBack);
+    }
+
+    document
+      .getElementById("proceed_button")
+      .addEventListener("click", function () {
+        document.getElementById("form").submit();
+      });
+
+    // Demander l'historique du chat
+    liveSend({ request_chat_history: true });
+
+    // ----- Partie ChatGPT -----
+    if (has_chat_gpt) {
+      buttonGPT.onclick = function (event) {
+        event.preventDefault(); // empêche le submit
+        sendChatMessage(inputGPT, false, chatBoxGPT)
+      };
+
+      // envoyer en appuyant sur Entrée
+      inputGPT.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          buttonGPT.click();
+          event.preventDefault();
+        }
+      });
+    }
+
+    updateWhenRefreshingPage();
+  });
+
+
 
   // ----- Partie chat entre joueurs -----
   let expireTime = parseFloat("{{ group.expire_time }}");
@@ -258,43 +278,48 @@ content }}
     const placeholder = is_expired
       ? "Temps écoulé"
       : "Joueur A a pris sa décision";
-    if (has_cheap_talk) {
-      document.getElementById("chat_input").disabled = true;
-      document.getElementById("send_msg_button").disabled = true;
-      document
-        .getElementById("chat_disabled_message")
-        .classList.remove("d-none");
-      document.getElementById("chat_input").placeholder = placeholder;
-    }
-    if (has_chat_gpt) {
-      inputGPT.disabled = true;
-      buttonGPT.disabled = true;
-      inputGPT.placeholder = placeholder;
-    }
+    if (has_cheap_talk)
+      setDisabled(inputCheapTalk, buttonCheapTalk, placeholder)
+
+    if (has_chat_gpt)
+      setDisabled(inputGPT, buttonGPT, placeholder)
+  }
+  // désactive les composants du chat
+  function setDisabled(input, button, placeholder) {
+    input.disabled = true;
+    button.disabled = true;
+    input.placeholder = placeholder;
   }
 
-  // Fonction pour envoyer un message
-  function sendChatMessage() {
-    const chatInput = document.getElementById("chat_input");
-    const message = chatInput.value.trim();
+  // Fonction pour envoyer un message, 
+  // isCheapTalk = vrai si discussion entre joueur, faux si avec chat gpt
+  function sendChatMessage(input, isCheapTalk, chatBox = null) {
+    const message = input.value.trim();
+    let dataToSend;
+    if (!message) return
 
-    if (message !== "" && timeRemaining > 0) {
-      // Envoyer le message avec le préfixe "Joueur A" ou "Joueur B" selon le rôle
+    if (isCheapTalk) { // entre joueurs
       const playerPrefix = roleIsPlayerA ? "Joueur A" : "Joueur B";
-      liveSend({
+      dataToSend = {
         message: message,
         player_type: playerPrefix,
-      });
-
-      chatInput.value = "";
-
-      // Maintenir le focus sur le champ de chat
-      chatInput.focus();
-
+      };
       if (isTyping) {
         doneTyping();
       }
     }
+    else { // avec chatGPT
+      if (chatBox) {
+        chatBox.innerHTML += `{{C.USER_PREFIX}}${message}<br>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      dataToSend = { message: message, is_chat_gpt: true };
+    }
+
+    liveSend(dataToSend);
+    input.value = "";
+    input.focus();
   }
 
   // Fonctions pour gérer l'indicateur de frappe
@@ -304,75 +329,7 @@ content }}
     clearTimeout(typingTimer);
   }
 
-  // Initialisation lorsque la page est chargée
-  document.addEventListener("DOMContentLoaded", function () {
-    // Activer le chat
-    if (has_cheap_talk) {
-      document.getElementById("chat_input").disabled = false;
-      document.getElementById("send_msg_button").disabled = false;
-    }
-
-    // Démarrer le timer
-    chatTimer = setInterval(updateChatTimer, 1000);
-
-    // Configurer les événements du chat
-    if (has_cheap_talk) {
-      document
-        .getElementById("send_msg_button")
-        .addEventListener("click", function (e) {
-          e.preventDefault(); // Empêcher le comportement par défaut qui pourrait causer un défilement
-          sendChatMessage();
-        });
-
-      const chatInput = document.getElementById("chat_input");
-      chatInput.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault(); // Empêcher le comportement par défaut du formulaire
-          sendChatMessage();
-          return;
-        }
-
-        if (!isTyping && timeRemaining > 0) {
-          isTyping = true;
-          liveSend({ typing_status: true });
-        }
-
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(doneTyping, doneTypingInterval);
-      });
-
-      chatInput.addEventListener("blur", function () {
-        clearTimeout(typingTimer);
-        if (isTyping) {
-          doneTyping();
-        }
-      });
-    }
-
-    // Configurer les événements du jeu
-    if (roleIsPlayerA) {
-      document
-        .getElementById("send_button")
-        .addEventListener("click", sendTokens);
-    } else {
-      document
-        .getElementById("send_back_button")
-        .addEventListener("click", sendTokensBack);
-    }
-
-    document
-      .getElementById("proceed_button")
-      .addEventListener("click", function () {
-        document.getElementById("form").submit();
-      });
-
-    // Demander l'historique du chat
-    liveSend({ request_chat_history: true });
-
-    updateWhenRefreshingPage();
-  });
-
-  //refais les envois en cas de refresh
+  // reconstruis les data et les envoie en cas de refresh
   function updateWhenRefreshingPage() {
     const amount_sent = js_vars.amount_sent;
     const amount_sent_back = js_vars.amount_sent_back;
@@ -464,15 +421,13 @@ content }}
 
   // Gestion des messages live
   function liveRecv(data) {
-    // Mise à jour du chat
 
-    if (data.is_chat_gpt == true) {
+    if (data.is_chat_gpt) {
       const reply = data.reply;
-
-      chatBoxGPT.textContent += `\n{{C.BOT_PREFIX}}${reply}`;
+      chatBoxGPT.innerHTML += `{{C.BOT_PREFIX}}${reply}<br>`;
       chatBoxGPT.scrollTop = chatBoxGPT.scrollHeight;
     }
-    if (data.new_message || data.full_chat) {
+    if (data.new_message) {
       const chatHistory = document.getElementById("chat_history");
 
       // Fonction pour remplacer "Joueur 1" par "Joueur A" et "Joueur 2" par "Joueur B"
@@ -481,13 +436,7 @@ content }}
           .replace(/Joueur 1:/g, "Joueur A:")
           .replace(/Joueur 2:/g, "Joueur B:");
       }
-
-      if (data.full_chat) {
-        chatHistory.innerHTML = formatChatMessages(data.full_chat);
-      } else if (data.new_message) {
-        chatHistory.innerHTML += formatChatMessages(data.new_message);
-      }
-
+      chatHistory.innerHTML += formatChatMessages(data.new_message);
       chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 

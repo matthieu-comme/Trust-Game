@@ -18,9 +18,12 @@ class C(BaseConstants):
     NUM_ROUNDS = 1
     ENDOWMENT = 10  # somme initiale du joueur A
     MULTIPLIER = 3
-    CHAT_DURATION = 120  # Temps de conversation en secondes
-    USER_PREFIX = "Joueur: "  # nom du joueur affiché avant son message dans le chat
-    BOT_PREFIX = "GPT: "  # pareil pour gpt
+    CHAT_DURATION = 12000  # Temps de conversation en secondes
+    USER_PREFIX = "<strong>Joueur:</strong> "  # nom du joueur affiché avant son message dans le chat
+    BOT_PREFIX = "<strong>GPT:</strong> "  # pareil pour gpt
+    CHAT_SEPARATOR = "<br>"  # séparateur entre 2 messages
+    NO_GPT_BEHAVIOR = "Non"
+    BEHAVIORS = ["Neutre", "Stratège", "Altruiste", NO_GPT_BEHAVIOR]
 
 
 class Subsession(BaseSubsession):
@@ -59,21 +62,24 @@ class Player(BasePlayer):
     message = models.LongStringField(blank=True)
     chat_history = models.LongStringField(initial="")
     gpt_history = models.LongStringField(initial="")
-    gpt_behavior = models.StringField(initial="Boruto")  # comportement du bot
+    gpt_behavior = models.StringField(initial="")  # comportement du bot
     # = vrai si discussion avec l'autre joueur activée
     has_cheap_talk = models.BooleanField()
 
 
-# FAIRE LE DISPATCH DES CHEAP TALK / GPT
-def set_gpt_behavior(player: Player):
-    behaviors = ["Neutre", "Stratège", "Altruiste", "Non"]
-    total_participants = len(player.session.get_participants())
+# définis si le joueur a le cheap talk et / ou chatgpt, avec son attitude
+# sur 8 duos ça fait par exemple : (has_cheap_talk, gpt_behavior)
+# (True,Neutre), (True,Stratège), (True,Altruise), (True,Non), (False,Neutre), (False,Stratège), (False,Altruise), (False,Non)
+def set_chat_options(player: Player):
+    behaviors = C.BEHAVIORS
+    nb_behaviors = len(behaviors)
+    nb_participants = len(player.session.get_participants())
     id = player.participant.id_in_session
-    index = ((id - 1) // 2) % 4
+    index = ((id - 1) // 2) % nb_behaviors
     player.gpt_behavior = behaviors[index]
 
-    # la première moitié des joueurs ont le cheap talk
-    player.has_cheap_talk = id <= total_participants // 2
+    # la première moitié des joueurs a le cheap talk
+    player.has_cheap_talk = id <= nb_participants // 2
 
 
 class BaseQuiz(Page):
@@ -139,14 +145,14 @@ class QuizExample1(BaseQuiz):
 class Instructions(Page):
 
     def vars_for_template(player: Player):
-        set_gpt_behavior(player)
+        set_chat_options(player)
         return {
             "gpt behavior": player.gpt_behavior,
             "has cheap talk": player.has_cheap_talk,
         }
 
     # def before_next_page(player: Player, timeout_happened):
-    #    set_gpt_behavior(player)
+    #    set_chat_options(player)
 
 
 # Méthode commune pour gérer les messages du chat
@@ -154,6 +160,7 @@ def handle_chat_message(player: Player, data):
     if "message" in data:
         letter = "A" if player.id_in_group == 1 else "B"
         message_html = f"<strong>Joueur {letter}:</strong> {data['message']}<br>"
+        print("message_html = " + message_html)
 
         # Ajouter le message à l'historique du chat du joueur
         player.chat_history += message_html
@@ -163,17 +170,14 @@ def handle_chat_message(player: Player, data):
 
         # Mettre à jour l'historique de tous les joueurs du groupe
         for p in player.group.get_players():
-            if p.id_in_group != player.id_in_group:
-                p.chat_history += message_html
-                responses[p.id_in_group] = {
-                    "new_message": message_html,
-                    "full_chat": p.chat_history,
-                }
-            else:
-                responses[p.id_in_group] = {"full_chat": p.chat_history}
-
+            p.chat_history += message_html
+            responses[p.id_in_group] = {
+                "new_message": message_html,
+                # "full_chat": p.chat_history,
+            }
         return responses
-    return None
+    else:
+        return None
 
 
 def chat_with_gpt(player: Player, data):
@@ -186,7 +190,7 @@ def chat_with_gpt(player: Player, data):
     history = player.gpt_history or ""
 
     # reconstruit messages_list
-    for line in history.strip().split("\n"):
+    for line in history.strip().split(C.CHAT_SEPARATOR):
         if line.startswith(C.USER_PREFIX):  # message de user
             messages_list.append(
                 {"role": "user", "content": line[len(C.USER_PREFIX) :]}
@@ -198,7 +202,7 @@ def chat_with_gpt(player: Player, data):
 
     messages_list.append({"role": "user", "content": user_message})
 
-    history += f"\n{C.USER_PREFIX}{user_message}"
+    history += f"{C.USER_PREFIX}{user_message}<br>"
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -206,7 +210,7 @@ def chat_with_gpt(player: Player, data):
     )
     bot_reply = response.choices[0].message.content
 
-    history += f"\n{C.BOT_PREFIX}{bot_reply}"
+    history += f"{C.BOT_PREFIX}{bot_reply}<br>"
     player.gpt_history = history
 
     return {
@@ -238,7 +242,11 @@ class SyncWaitPage(WaitPage):
 class GamePlay(Page):
 
     def vars_for_template(player: Player):
-        return {"gpt_history": player.gpt_history}
+        return {
+            "has_chat_gpt": player.gpt_behavior != C.NO_GPT_BEHAVIOR,
+            "gpt_history": player.gpt_history,
+            "chat_history": player.chat_history,
+        }
 
     @staticmethod
     def live_method(player: Player, data):
