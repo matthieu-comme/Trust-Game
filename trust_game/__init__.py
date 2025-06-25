@@ -18,7 +18,7 @@ class C(BaseConstants):
     NUM_ROUNDS = 1
     ENDOWMENT = 10  # somme initiale du joueur A
     MULTIPLIER = 3
-    CHAT_DURATION = 12000  # Temps de conversation en secondes
+    CHAT_DURATION = 120  # Temps de conversation en secondes
     USER_PREFIX = "<strong>Joueur:</strong> "  # nom du joueur affiché avant son message dans le chat
     BOT_PREFIX = "<strong>GPT:</strong> "  # pareil pour gpt
     CHAT_SEPARATOR = "<br>"  # séparateur entre 2 messages
@@ -160,7 +160,6 @@ def handle_chat_message(player: Player, data):
     if "message" in data:
         letter = "A" if player.id_in_group == 1 else "B"
         message_html = f"<strong>Joueur {letter}:</strong> {data['message']}<br>"
-        print("message_html = " + message_html)
 
         # Ajouter le message à l'historique du chat du joueur
         player.chat_history += message_html
@@ -218,6 +217,7 @@ def chat_with_gpt(player: Player, data):
             "is_chat_gpt": True,
             "reply": bot_reply,
             "gpt_history": history,
+            "bot_prefix": C.BOT_PREFIX,
         }
     }
 
@@ -350,7 +350,7 @@ class Results(Page):
 
 page_sequence = [
     Instructions,
-    # QuizExample1,
+    QuizExample1,
     SyncWaitPage,
     GamePlay,
     Results,

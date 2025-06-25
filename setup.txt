@@ -1,0 +1,2 @@
+Testing framework: npm install --save-dev jest
+Testing DOM: npm install --save-dev jest-environment-jsdom

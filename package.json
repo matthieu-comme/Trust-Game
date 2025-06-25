@@ -1,0 +1,27 @@
+{
+  "name": "trust-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthieu-comme/Trust-Game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matthieu-comme/Trust-Game/issues"
+  },
+  "homepage": "https://github.com/matthieu-comme/Trust-Game#readme",
+  "devDependencies": {
+    "jest": "^30.0.2",
+    "jest-environment-jsdom": "^30.0.2"
+  },
+  "dependencies": {
+    "jsdom": "^26.1.0"
+  }
+}
