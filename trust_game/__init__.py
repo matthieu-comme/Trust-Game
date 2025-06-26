@@ -23,7 +23,7 @@ class C(BaseConstants):
     BOT_PREFIX = "<strong>GPT:</strong> "  # pareil pour gpt
     CHAT_SEPARATOR = "<br>"  # séparateur entre 2 messages
     NO_GPT_BEHAVIOR = "Non"
-    BEHAVIORS = ["Neutre", "Stratège", "Altruiste", NO_GPT_BEHAVIOR]
+    BEHAVIORS = [NO_GPT_BEHAVIOR, "Neutre", "Stratège", "Altruiste"]
 
 
 class Subsession(BaseSubsession):
@@ -69,7 +69,7 @@ class Player(BasePlayer):
 
 # définis si le joueur a le cheap talk et / ou chatgpt, avec son attitude
 # sur 8 duos ça fait par exemple : (has_cheap_talk, gpt_behavior)
-# (True,Neutre), (True,Stratège), (True,Altruise), (True,Non), (False,Neutre), (False,Stratège), (False,Altruise), (False,Non)
+# (False,Non), (False,Neutre), (False,Stratège), (False,Altruise), (True,Non), (True,Neutre), (True,Stratège), (True,Altruise)
 def set_chat_options(player: Player):
     behaviors = C.BEHAVIORS
     nb_behaviors = len(behaviors)
@@ -78,8 +78,8 @@ def set_chat_options(player: Player):
     index = ((id - 1) // 2) % nb_behaviors
     player.gpt_behavior = behaviors[index]
 
-    # la première moitié des joueurs a le cheap talk
-    player.has_cheap_talk = id <= nb_participants // 2
+    # la deuxième moitié des joueurs a le cheap talk
+    player.has_cheap_talk = id > nb_participants // 2
 
 
 class BaseQuiz(Page):
