@@ -1,2 +1,9 @@
-Testing framework: npm install --save-dev jest
-Testing DOM: npm install --save-dev jest-environment-jsdom
+pip install pytest
+
+Node : https://nodejs.org/en/download/
+
+Installe toutes les dépendances indiquées dans le fichier package.json:
+npm install 
+
+Lancer les tests:
+npm test

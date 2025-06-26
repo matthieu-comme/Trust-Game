@@ -71,7 +71,7 @@ function doneTyping() {
   clearTimeout(typingTimer);
 }
 
-// reconstruis les data et les envoie en cas de refresh
+// reconstruis les data et les traite en cas de refresh
 function refreshFromSavedData() {
   const amount_sent = js_vars.amount_sent;
   const amount_sent_back = js_vars.amount_sent_back;

@@ -60,8 +60,8 @@ class Player(BasePlayer):
     y = models.IntegerField()
     z = models.IntegerField()
     message = models.LongStringField(blank=True)
-    chat_history = models.LongStringField(initial="")
-    gpt_history = models.LongStringField(initial="")
+    chat_history = models.LongStringField(initial="toto123")
+    gpt_history = models.LongStringField(initial="caca")
     gpt_behavior = models.StringField(initial="")  # comportement du bot
     # = vrai si discussion avec l'autre joueur activée
     has_cheap_talk = models.BooleanField()
@@ -155,16 +155,11 @@ class Instructions(Page):
     #    set_chat_options(player)
 
 
-# Méthode commune pour gérer les messages du chat
+# gérer les messages du chat
 def handle_chat_message(player: Player, data):
     if "message" in data:
         letter = "A" if player.id_in_group == 1 else "B"
         message_html = f"<strong>Joueur {letter}:</strong> {data['message']}<br>"
-
-        # Ajouter le message à l'historique du chat du joueur
-        player.chat_history += message_html
-
-        # Préparer les réponses pour tous les joueurs
         responses = {}
 
         # Mettre à jour l'historique de tous les joueurs du groupe
@@ -172,7 +167,6 @@ def handle_chat_message(player: Player, data):
             p.chat_history += message_html
             responses[p.id_in_group] = {
                 "new_message": message_html,
-                # "full_chat": p.chat_history,
             }
         return responses
     else:
@@ -222,6 +216,62 @@ def chat_with_gpt(player: Player, data):
     }
 
 
+def handle_typing_status(player: Player, data) -> dict:
+    is_typing = data["typing_status"]
+    responses = {}
+    # Informer l'autre joueur uniquement
+    for p in player.group.get_players():
+        if p.id_in_group != player.id_in_group:
+            responses[p.id_in_group] = {
+                "other_player_typing": is_typing,
+                "player_id": player.id_in_group,
+            }
+    return responses
+
+
+def handle_amount_sent(player: Player, data) -> dict:
+    amount = int(data["amount_sent"])
+    group: Group = player.group
+    if 0 <= amount <= C.ENDOWMENT:
+        group.amount_sent = amount
+        # Notifier les deux joueurs
+        responses = {}
+        for p in group.get_players():
+            if p.id_in_group == 1:  # Joueur A
+                responses[p.id_in_group] = {
+                    "status": "sent",
+                    "amount_sent": amount,
+                }
+            else:  # Joueur B
+                responses[p.id_in_group] = {
+                    "status": "received",
+                    "amount_sent": amount,
+                    "tripled_amount": int(amount * C.MULTIPLIER),
+                }
+        return responses
+
+
+def handle_amount_sent_back(player: Player, data) -> dict:
+    group: Group = player.group
+    amount_back = int(data["amount_sent_back"])
+    tripled_amount = int(group.amount_sent * C.MULTIPLIER)
+
+    if 0 <= amount_back <= tripled_amount:
+        group.amount_sent_back = amount_back
+        # Notifier les deux joueurs que la transaction est complète
+        responses = {}
+        for p in group.get_players():
+            responses[p.id_in_group] = {
+                "status": "complete",
+                "can_proceed": True,
+                "amount_sent": group.amount_sent,
+                "amount_sent_back": amount_back,
+                "tripled_amount": tripled_amount,
+            }
+        group.set_payoffs()  # Calculer les gains
+        return responses
+
+
 class SyncWaitPage(WaitPage):
 
     def after_all_players_arrive(group: Group):
@@ -250,67 +300,24 @@ class GamePlay(Page):
 
     @staticmethod
     def live_method(player: Player, data):
-
         if "is_chat_gpt" in data:
             return chat_with_gpt(player, data)
 
-        # Gérer les messages du chat
+        # cheap talk
         if "message" in data:
             return handle_chat_message(player, data)
 
-        # Gérer l'indicateur de frappe
+        # indicateur de frappe
         if "typing_status" in data:
-            is_typing = data["typing_status"]
-            responses = {}
-            # Informer l'autre joueur uniquement
-            for p in player.group.get_players():
-                if p.id_in_group != player.id_in_group:
-                    responses[p.id_in_group] = {
-                        "other_player_typing": is_typing,
-                        "player_id": player.id_in_group,
-                    }
-            return responses
+            return handle_typing_status(player, data)
 
-        # Gérer l'envoi de jetons par le joueur A
+        # envoi de jetons par le joueur A
         if "amount_sent" in data and player.id_in_group == 1:
-            amount = float(data["amount_sent"])
-            if 0 <= amount <= C.ENDOWMENT:
-                player.group.amount_sent = amount
-                # Notifier les deux joueurs
-                responses = {}
-                for p in player.group.get_players():
-                    if p.id_in_group == 1:  # Joueur A
-                        responses[p.id_in_group] = {
-                            "status": "sent",
-                            "amount_sent": amount,
-                        }
-                    else:  # Joueur B
-                        responses[p.id_in_group] = {
-                            "status": "received",
-                            "amount_sent": amount,
-                            "tripled_amount": int(amount * C.MULTIPLIER),
-                        }
-                return responses
+            return handle_amount_sent(player, data)
 
-        # Gérer le renvoi de jetons par le joueur B
+        # renvoi de jetons par le joueur B
         if "amount_sent_back" in data and player.id_in_group == 2:
-            amount_back = float(data["amount_sent_back"])
-            tripled_amount = int(player.group.amount_sent * C.MULTIPLIER)
-
-            if 0 <= amount_back <= tripled_amount:
-                player.group.amount_sent_back = amount_back
-                # Notifier les deux joueurs que la transaction est complète
-                responses = {}
-                for p in player.group.get_players():
-                    responses[p.id_in_group] = {
-                        "status": "complete",
-                        "can_proceed": True,
-                        "amount_sent": player.group.amount_sent,
-                        "amount_sent_back": amount_back,
-                        "tripled_amount": tripled_amount,
-                    }
-                player.group.set_payoffs()  # Calculer les gains
-                return responses
+            return handle_amount_sent_back(player, data)
 
         return None
 
@@ -335,7 +342,7 @@ class WaitForResults(WaitPage):
 class Results(Page):
     @staticmethod
     def vars_for_template(player: Player):
-        group = player.group
+        group: Group = player.group
         sent = int(group.amount_sent)
         sent_back = int(group.amount_sent_back)
         tripled = sent * C.MULTIPLIER
