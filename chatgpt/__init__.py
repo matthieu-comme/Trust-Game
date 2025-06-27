@@ -28,7 +28,7 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     gpt_history = models.LongStringField(initial="")  # texte concaténé
-    gpt_behavior = models.StringField(initial="Boruto")  # comportement du bot
+    gpt_behavior = models.StringField(initial="labrador")  # comportement du bot
 
 
 def chat_with_gpt(player: Player, data):

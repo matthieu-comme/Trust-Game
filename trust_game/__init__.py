@@ -60,8 +60,8 @@ class Player(BasePlayer):
     y = models.IntegerField()
     z = models.IntegerField()
     message = models.LongStringField(blank=True)
-    chat_history = models.LongStringField(initial="toto123")
-    gpt_history = models.LongStringField(initial="caca")
+    chat_history = models.LongStringField(initial="")
+    gpt_history = models.LongStringField(initial="")
     gpt_behavior = models.StringField(initial="")  # comportement du bot
     # = vrai si discussion avec l'autre joueur activée
     has_cheap_talk = models.BooleanField()
@@ -155,14 +155,14 @@ class Instructions(Page):
     #    set_chat_options(player)
 
 
-# gérer les messages du chat
+# gérer les messages du chat entre joueurs
 def handle_chat_message(player: Player, data):
     if "message" in data:
         letter = "A" if player.id_in_group == 1 else "B"
         message_html = f"<strong>Joueur {letter}:</strong> {data['message']}<br>"
         responses = {}
 
-        # Mettre à jour l'historique de tous les joueurs du groupe
+        # update l'historique de tous les joueurs du groupe
         for p in player.group.get_players():
             p.chat_history += message_html
             responses[p.id_in_group] = {

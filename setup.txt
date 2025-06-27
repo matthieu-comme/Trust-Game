@@ -1,9 +1,0 @@
-pip install pytest
-
-Node : https://nodejs.org/en/download/
-
-Installe toutes les dépendances indiquées dans le fichier package.json:
-npm install 
-
-Lancer les tests:
-npm test
