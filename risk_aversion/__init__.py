@@ -142,6 +142,7 @@ class Player(BasePlayer):
 
         return result
 
+    # prend en entrée un indice réel
     # retourne l'indice visible par le joueur en prenant en compte celles qui sont masquées par des conditions
     def get_visible_index(self, indice) -> int:
         all_real_index = self.get_all_real_index()
@@ -232,7 +233,7 @@ def get_ball_color(is_blue: bool) -> str:
 
 
 # retourne l'indice réel de la décision tirée au sort
-def getFinalDecision(player: Player) -> int:
+def get_final_decision(player: Player) -> int:
     decisions = [
         player.inv1,
         player.inv2,
@@ -251,9 +252,9 @@ def getFinalDecision(player: Player) -> int:
 
 
 # retourne le profit final
-def finalProfit(player: Player) -> Currency:
+def final_profit(player: Player) -> Currency:
 
-    i = player.real_chosen_decision = getFinalDecision(player)
+    i = player.real_chosen_decision = get_final_decision(player)
     player.chosen_decision = player.get_visible_index(i)
     invested = getattr(player, f"inv{i}")  # somme investie à cette décision
 
@@ -281,14 +282,14 @@ def profit_3_4(invested: int, ball_color: str) -> int:
 
 
 def profit_5_8(current_decision: int, invested: int, ball_color: str) -> int:
-    profit = getAbsoluteProfit(invested, ball_color)  # profit positif si i=5|6
+    profit = get_absolute_profit(invested, ball_color)  # profit positif si i=5|6
     if current_decision == 7 or current_decision == 8:  # sinon profit négatif
         profit *= -1
     return profit
 
 
 # retourne abs(profit) pour décisions 5-8
-def getAbsoluteProfit(invested: str, ball_color: str) -> int:
+def get_absolute_profit(invested: str, ball_color: str) -> int:
     n = C.MAX_INVESTMENT
 
     match invested:
@@ -333,7 +334,7 @@ def get_li_items_5_8(known: bool) -> list:
 
 
 # retourne les résultats des tirages 5 à 8 en adaptant si c'est un gain ou une perte de jetons
-def getResults(win: bool) -> list:
+def get_results(win: bool) -> list:
     n = C.MAX_INVESTMENT
     if win:
         word = "gagnez"
@@ -349,7 +350,7 @@ def getResults(win: bool) -> list:
 
 
 # retourne le contenu des urnes, prend en compte s'il est connu ou non
-def getBoxes(known: bool) -> list:
+def get_boxes(known: bool) -> list:
     n = demi = tier = ""
     if known:
         n = C.BALL_NUMBER
@@ -463,7 +464,7 @@ class InvestmentDecision5_8(Page):
                 win = False
 
         return getTemplate(player) | {
-            "rows": zip(["A", "B", "C", "D"], getBoxes(known), getResults(win)),
+            "rows": zip(["A", "B", "C", "D"], get_boxes(known), get_results(win)),
             "li_items": get_li_items_5_8(known),
         }
 
@@ -475,14 +476,14 @@ class TirageFinal(Page):
         return getTemplate(player) | {"profit": player.profit}
 
     def before_next_page(player: Player, timeout_happened):
-        player.profit = finalProfit(player)
+        player.profit = final_profit(player)
         player.payoff += player.profit
 
 
 class Fin(Page):
     # pour essayer plusieurs tirages consécutifs
     # def is_displayed(player: Player):
-    #    player.profit = finalProfit(player)
+    #    player.profit = final_profit(player)
     #    player.payoff += player.profit
     #    return True
 
