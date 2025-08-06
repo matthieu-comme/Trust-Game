@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from dispatcher_2 import get_all_link_codes
+from dispatcher import get_all_link_codes
 
 
 class TestGetAllLinkCodes(unittest.TestCase):
-    @patch("dispatcher_2.requests.Session")  # remplace requests.Session par un faux
+    @patch("dispatcher.requests.Session")  # remplace requests.Session par un faux
     def test_link_parsing(self, mock_session_class):
 
         fake_html = """

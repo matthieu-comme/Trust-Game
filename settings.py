@@ -27,10 +27,10 @@ SESSION_CONFIGS = [
         app_sequence=["questionnaire"],
     ),
     dict(
-        name="dispatcher_2",
-        display_name="Dispatcher 2",
+        name="dispatcher",
+        display_name="Dispatcher",
         num_demo_participants=3 * PLAYERS_PER_GROUP,
-        app_sequence=["dispatcher_2"],
+        app_sequence=["dispatcher"],
     ),
     dict(
         name="groupe_1",
@@ -50,12 +50,7 @@ SESSION_CONFIGS = [
         num_demo_participants=PLAYERS_PER_GROUP,
         app_sequence=["questionnaire", "trust_game", "risk_aversion"],
     ),
-    dict(
-        name="experiment_randomized",
-        display_name="Expérience randomisée par groupe",
-        num_demo_participants=3 * PLAYERS_PER_GROUP,
-        app_sequence=["dispatcher", "questionnaire", "trust_game", "risk_aversion"],
-    ),
+
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
