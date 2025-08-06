@@ -1,20 +1,51 @@
-{{ block title }} Tâche rémunérée {{ endblock }} 
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'empty.css' %}">
+{% endblock %}
+
+{% block title %}
+
+  <h1 class="page-title"> Tâche rémunérée </h1>
+
+{% endblock %}
+
 
 {% block content %}
 
-<p><strong>🎉 Félicitations ! Vous avez gagné {{ player.payoff | to0 }}.</strong></p>
+<div class="container">
+    <div class="info-card">
+        <div class="success-section">
+            <div class="success-icon">🎉</div>
+            <p class="success-message">
+                <strong>Félicitations ! Vous avez gagné <span class="highlight">{{ player.payoff | to0 }}</span>.</strong>
+            </p>
+        </div>
 
-<p>Vous pouvez maintenant utiliser vos jetons dans une série de jeux de décisions.</p>
-<p>
-  Chacune de vos décisions est <strong>indépendante</strong> des autres décisions. À <strong>la fin de cette
-  série de jeux, une seule de ces décisions sera tirée au sort</strong> parmi toutes les décisions
-  pour déterminer votre gain final.
-</p>
+        <div class="intro-section">
+            <p class="intro-text">
+                Vous pouvez maintenant utiliser vos jetons dans une série de jeux de décisions.
+            </p>
+            <p class="task-description">
+                Chacune de vos décisions sera <strong>indépendante</strong> des autres décisions. À <strong>la fin de cette série de jeux, une seule de ces décisions sera tirée au sort</strong> parmi toutes les décisions
+                pour déterminer votre gain final.
+            </p>
+        </div>
 
-<div class="alert alert-warning">
-  ⚠️ Il est donc essentiel de <strong>traiter chaque décision avec attention</strong>, comme si
-  elle seule comptait.
+        <div class="alert-box">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <p>
+                    Il est donc essentiel de <strong>traiter chaque décision avec attention</strong>, comme si
+                    elle seule comptait.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="button-container">
+        {{ next_button }}
+    </div>
 </div>
 
-<button class="btn btn-primary">Continuer</button>
 {% endblock %}

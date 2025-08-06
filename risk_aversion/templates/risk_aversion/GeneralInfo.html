@@ -1,26 +1,45 @@
-{% block title %} Informations générales {% endblock %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'empty.css' %}">
+{% endblock %}
+
+{% block title %}
+
+	<h1 class="page-title">Informations générales</h1>
+
+{% endblock %}
+
+
 {% block content %}
 
-<p>
-  Bonjour, dans cette partie, nous allons vous demander de faire des choix avec les jetons que vous allez gagner.
-</p>
 
-<p>Cette étape comprend :</p>
-<ul>
-  <li>
-    ✅ une tâche rémunérée qui vous permettra de gagner
-    <strong>{{ C.ENDOWMENT | to0 }} </strong> ;
-  </li>
-  <li>🎲 une série de jeux dans lesquels le hasard joue un rôle.</li>
-</ul>
+<div class="info-wrapper">
 
-<div class="alert alert-info">
-  💡 À la fin de cette série de jeux,
-  <strong>une seule de vos décisions</strong> est tirée au sort pour déterminer
-  votre gain ou perte final.<br />
-  Cela signifie que chaque décision compte : il est donc important de répondre à
-  chaque décision avec attention.
+    <p class="welcome-text">
+        Dans cette partie, vous devrez faire des choix avec des jetons que vous allez gagner.
+    </p>
+
+
+    <h3>Cette étape comprend :</h3>
+    <ul class="steps-list">
+        <li>
+            ✅ Une tâche rémunérée qui vous permettra de gagner 
+            <strong class="highlight">{{ C.ENDOWMENT | to0 }}</strong>
+        </li>
+        <li>🎲 Une série de jeux de décisions où le hasard joue un rôle.</li>
+    </ul>
+
+    <div class="alert-box">
+        💡 À la fin de cette série de jeux, <strong>une seule de vos décisions</strong> est tirée au sort pour déterminer votre gain ou perte final.
+        <br>
+        <span class="alert-note">Cela signifie que chaque décision compte : il est donc important de répondre à chaque décision avec attention.</span>
+    </div>
+
+    <div class="button-container">
+        {{ next_button }}
+    </div>
 </div>
 
-<button class="btn btn-primary">Continuer</button>
 {% endblock %}
+

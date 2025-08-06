@@ -1,32 +1,78 @@
-{{ block title }} Investissez vos jetons – Décision {{ player.confirmed_decision_count }} {{ endblock }} 
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'empty.css' %}">
+
+{% endblock %}
+
+{% block title %}
+
+  <h1 class="page-title"> Décision {{ player.confirmed_decision_count }} - Investissez vos jetons </h1>
+
+{% endblock %}
+
 {{ block content }}
 
 <p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
-<p><strong>Combien souhaitez-vous investir ?</strong></p>
 
-{{ if real_current_decision == 1 }}
-    {{ formfield 'inv1' }}
-{{ elif real_current_decision == 2}}
-    {{ formfield 'inv2' }}
-{{ elif real_current_decision == 3}}
-    {{ formfield 'inv3' }}
-{{ elif real_current_decision == 4}}
-    {{ formfield 'inv4' }}
-{{ endif }}
+<div class="container">
+    <div class="decision-card">
+        <div class="question-section">
 
-<div id="preview">
-  <p id="kept"></p>
-  <strong>Vos jetons après tirage :</strong>
-  <ul>
-    <li><span class="ball yellow"></span> Boule JAUNE : <span id="gains_if_yellow"></span></li>
-    <li><span class="ball purple"></span> Boule VIOLETTE : <span id="gains_if_purple"></span></li>
-  </ul>
+            <h5><strong>Combien souhaitez-vous investir ?</strong></h5>
+
+            <div class="investment-form">
+                {{ if real_current_decision == 1 }}
+                    <span>{{ form.inv1.label }}</span> {{ form.inv1 }} jetons.
+                {{ elif real_current_decision == 2 }}
+                    <span>{{ form.inv2.label }}</span> {{ form.inv2 }} jetons.
+                {{ elif real_current_decision == 3 }}
+                    <span>{{ form.inv3.label }}</span> {{ form.inv3 }} jetons.
+                {{ elif real_current_decision == 4 }}
+                    <span>{{ form.inv4.label }}</span> {{ form.inv4 }} jetons.
+                {{ endif }}
+            </div>
+
+        </div>
+
+        <div class="preview-section" id="preview">
+            <div class="preview-header">
+                <h3>Résumé de votre investissement</h3>
+                <p id="kept" class="kept-amount"></p>
+            </div>
+
+            <div class="outcomes">
+                <h4>Vos jetons après tirage :</h4>
+                <div class="outcome-list">
+                    <div class="outcome-item">
+                        <div class="option-icon"><span class="ball yellow"></span></div>
+                        <div class="option-text">Tirage JAUNE : <span id="gains_if_yellow"></span></div>
+                    </div>
+                    <div class="explanation-text">
+                        <p>Si vous tirez une boule jaune, vous gagnez 3 fois votre investissement en plus de vos jetons gardés.</p>
+                    </div>
+                    <div class="outcome-item">
+                        <div class="option-icon"><span class="ball purple"></span></div>
+                        <div class="option-text">Tirage VIOLET : <span id="gains_if_purple"></span></div>
+                    </div>
+                </div>
+          </div>
+        </div>
+
+    </div>
 </div>
 
-{{ next_button }} 
 
-{{ include_sibling 'style.html'}} 
+
+<div class="button-container">
+        {{ next_button }}
+</div>
 
 {{ include_sibling 'scripts.html'}} 
 
+{{ include_sibling 'style.html'}}
+
 {{ endblock }}
+
+
+

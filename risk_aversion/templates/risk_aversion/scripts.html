@@ -33,12 +33,10 @@
   function updateKept(kept_value) {
     let result;
     if (current_decision == 1 || current_decision == 2) {
-      result = "-> je garde <strong>" + kept_value + "</strong> jetons";
+      result = "Vous investissez <strong> ... </strong> jetons et vous gardez <strong>" + kept_value + "</strong> jetons.";
     } else {
       result =
-        "-> donc je ne mise pas les <strong>" +
-        kept_value +
-        "</strong> autres jetons qui sont définitivement perdus";
+        "Vous ne misez pas les <strong>" + kept_value + "</strong> autres jetons qui sont définitivement perdus";
     }
     return result;
   }

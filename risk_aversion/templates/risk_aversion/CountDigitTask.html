@@ -1,36 +1,44 @@
-{{ block title }} Tâche rémunérée {{ endblock }} 
-{{ block content }}
-<div class="card mb-3">
-  <div class="card-body">
-    
-    <p>
-      Vous allez maintenant accomplir une tâche qui vous permettra de gagner
-      <strong>{{ C.ENDOWMENT | to0 }}</strong>.
-    </p>
-    <p>
-      Trouver le nombre d'occurrences du chiffre
-      <strong>{{ digit }}</strong> dans les <strong>200</strong> premières
-      décimales du nombre π :
-    </p>
+{% load static %}
 
-    <div
-      class="pi-digits"
-      style="
-        font-family: monospace;
-        font-size: 1.2em;
-        line-height: 1.8;
-        word-break: break-all;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 5px;
-        margin: 20px 0;
-      "
-    >
-      π = 3, {{ pi_digits }}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'empty.css' %}">
+{% endblock %}
+
+{% block title %}
+
+  <h1 class="page-title"> Tâche rémunérée </h1>
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="info-card">
+        <div class="intro-section">
+            <p class="intro-text">
+                Vous allez maintenant accomplir une tâche qui vous permettra de gagner
+                <strong class="highlight">{{ C.ENDOWMENT | to0 }}</strong>.
+            </p>
+            <p class="task-description">
+                Trouver le nombre d'occurrences du chiffre
+                <strong class="digit-highlight">{{ digit }}</strong> dans les <strong>200</strong> premières
+                décimales du nombre π :
+            </p>
+        </div>
+
+        <div class="pi-section">
+            <div class="pi-digits">
+                π = 3, {{ pi_digits }}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-group">{{ formfields }}</div>
+        </div>
     </div>
 
-    <div class="form-group mt-4">{{ formfields }}</div>
-  </div>
+    <div class="button-container">
+        {{ next_button }}
+    </div>
 </div>
 
-{{ next_button }} {{ endblock }}
+{% endblock %}
