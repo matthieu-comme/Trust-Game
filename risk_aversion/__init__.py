@@ -27,6 +27,7 @@ class C(BaseConstants):
         "48 111 745 028 410 270 193 852 110 555 964 462 294 895 493 038 196"
     )
     BALL_NUMBER = 60  # nombre total de boules dans l'urne
+    CONVERSION_RATE = 0.5
 
 
 class Subsession(BaseSubsession):
@@ -68,6 +69,7 @@ class Player(BasePlayer):
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
         initial=-1,
         label="Je décide d'investir :",
+        blank=False
     )
     inv2 = models.IntegerField(
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
@@ -369,6 +371,17 @@ def get_boxes(known: bool) -> list:
 
 
 class GeneralInfo(Page):
+    def vars_for_template(player: Player):
+        rate = C.CONVERSION_RATE
+        exemple1 = C.ENDOWMENT
+        exemple2 = exemple1 // 3
+        return {
+            "rate": int(rate * 100),
+            "exemple1_euros": int(exemple1 * rate),
+            "exemple2": exemple2,
+            "exemple2_euros": int(exemple2 * rate),
+        }
+
     # Génère aléatoirement le chiffre à compter
     def before_next_page(player: Player, timeout_happened):
         player.init_real_index()
@@ -423,7 +436,7 @@ class InvestmentConfirm(Page):
 
 class InvestmentIntro1_4(Page):
     def vars_for_template(player: Player):
-        return {"ball_number_per_color": C.BALL_NUMBER // 2} | getTemplate(player)
+        return {'ball_number_per_color': C.BALL_NUMBER // 2 } | getTemplate(player)
 
 
 class InvestmentDecision1_4(Page):

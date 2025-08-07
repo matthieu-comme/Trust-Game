@@ -1,7 +1,20 @@
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'empty.css' %}">
+
+{% endblock %}
+
 {{ block title }} Investissez vos jetons – Décision {{ player.confirmed_decision_count }} {{ endblock }} 
 {% block content %}
 
 <p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
+
+<div class="alert-box">
+La décision donnant lieu à votre rémunération finale n’étant tirée au sort parmi toutes vos décisions qu’à la fin de la première partie, 
+vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}</strong> initiaux.
+</div>
+
 <p>Vous allez maintenant choisir un <strong>tirage au sort parmi plusieurs tirages possibles</strong>.</p>
 <p>
     Chaque tirage correspond à une urne contenant des boules de couleurs
@@ -37,14 +50,26 @@
     </tbody>
   </table>
 
-{{ next_button }} 
+<div class="button-container">
+    {% block next_button %}
+      <button class="otree-btn-next btn btn-primary">Validez votre choix</button>
+    {% endblock %}
+</div>
 
 {{ include_sibling 'style.html'}} 
 
 <style>
-    table, td {
-      border: 1px solid black;
+  
+    table, th, td {
+        text-align: center;
+        vertical-align: middle;
+        border: 1px solid black;
     }
+
+    th,td {
+      padding: 5px 8px;
+    }
+
   </style>
   
 {% endblock %}

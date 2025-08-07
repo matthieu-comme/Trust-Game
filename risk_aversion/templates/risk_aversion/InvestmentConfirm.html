@@ -1,14 +1,11 @@
 {% block title %} Investissez vos jetons - Décision {{ player.confirmed_decision_count }} {% endblock %}
 
 {% block content %}
-<h2>✅ Votre décision {{ player.confirmed_decision_count }} a bien été enregistrée</h2>
 
 <p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
-
+<p>✅ Votre décision a bien été enregistrée</p>
 <p>⚠️ Elle pourra être tirée au sort à la fin de cette étape pour déterminer vos gains.</p>
-<p><strong>À ce stade :</strong><br>
-  Votre décision n’a pas encore été tirée au sort. Vous avez toujours <strong>{{ player.payoff | to0 }}</strong>.
-</p>
 
 {{ next_button }}
+
 {% endblock %}

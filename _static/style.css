@@ -22,7 +22,7 @@
 ----------------------------------------*/
 .container,
 .info-wrapper,
-.info-card {
+.info-card {    
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
@@ -226,7 +226,6 @@
   ALERTES / MESSAGES D'INFORMATION
 ----------------------------------------*/
 .alert-box {
-    display: flex;
     padding: 20px;
     background: #fff3cd;
     border-left: 4px solid #ffc107;

@@ -13,6 +13,7 @@ SESSION_CONFIGS = [
         display_name="Mesure d'aversion au risque",
         num_demo_participants=1,
         app_sequence=["risk_aversion"],
+        real_world_currency_per_point=0.50,
     ),
     dict(
         name="trust_game_test",
@@ -69,7 +70,7 @@ SESSION_FIELDS = []
 # for example: de, fr, ja, ko, zh-hans
 
 # e.g. EUR, GBP, CNY, JPY
-REAL_WORLD_CURRENCY_CODE = "USD"
+REAL_WORLD_CURRENCY_CODE = "EUR"
 USE_POINTS = True
 
 ROOMS = [

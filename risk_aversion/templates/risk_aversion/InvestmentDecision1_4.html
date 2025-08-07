@@ -15,6 +15,11 @@
 
 <p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
 
+<div class="alert-box">
+    Vous pouvez tester les effets potentiels des différents choix possibles en cliquant sur les valeurs du menu déroulant. 
+    Votre décision ne sera définitive qu’après avoir cliqué sur le bouton « validez votre choix » en bas de l’écran
+</div>
+
 <div class="container">
     <div class="decision-card">
         <div class="question-section">
@@ -46,14 +51,11 @@
                 <div class="outcome-list">
                     <div class="outcome-item">
                         <div class="option-icon"><span class="ball yellow"></span></div>
-                        <div class="option-text">Tirage JAUNE : <span id="gains_if_yellow"></span></div>
-                    </div>
-                    <div class="explanation-text">
-                        <p>Si vous tirez une boule jaune, vous gagnez 3 fois votre investissement en plus de vos jetons gardés.</p>
+                        <div class="option-text">Tirage <strong>JAUNE</strong> : <span id="gains_if_yellow"></span></div>
                     </div>
                     <div class="outcome-item">
                         <div class="option-icon"><span class="ball purple"></span></div>
-                        <div class="option-text">Tirage VIOLET : <span id="gains_if_purple"></span></div>
+                        <div class="option-text">Tirage <strong>VIOLET</strong> : <span id="gains_if_purple"></span></div>
                     </div>
                 </div>
           </div>
@@ -65,7 +67,9 @@
 
 
 <div class="button-container">
-        {{ next_button }}
+    {% block next_button %}
+      <button class="otree-btn-next btn btn-primary">Validez votre choix</button>
+    {% endblock %}
 </div>
 
 {{ include_sibling 'scripts.html'}} 

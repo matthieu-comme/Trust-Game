@@ -29,44 +29,70 @@
     gains_if_purple.textContent = result.purple;
   }
 
-  // retourne le message concernant les jetons gardés
+  // retourne le message concernant les jetons conservés
   function updateKept(kept_value) {
     let result;
-    if (current_decision == 1 || current_decision == 2) {
-      result = "Vous investissez <strong> ... </strong> jetons et vous gardez <strong>" + kept_value + "</strong> jetons.";
-    } else {
-      result =
-        "Vous ne misez pas les <strong>" + kept_value + "</strong> autres jetons qui sont définitivement perdus";
+    const invested = max_investment - kept_value;
+    const pl_kept = isPlural(kept_value);
+    const pl_invested = isPlural(invested);
+    let s;
+
+    result = "Vous misez <strong> "+ invested +" </strong> jeton" + pl_invested + " et conservez <strong>" + kept_value + "</strong> jeton" + pl_kept;
+
+    if (current_decision == 3 || current_decision == 4) {
+      if(kept_value != 0 ) {
+        if(pl_kept)
+          s = " qui seront définitivement perdus";
+        else
+        s = " qui sera définitivement perdu";
+
+        result += s;
+      }
     }
-    return result;
+
+    return result + ".";
   }
 
   // Ces fonctions retournent les textes correspondant aux tirages jaune et violet en fonction de la décision
-  // prennent en paramètres le nb de jetons gardés et investis
+  // prennent en paramètres le nb de jetons conservés et investis
 
+  function isPlural(value) {
+    if (value <=1 )
+      return "";
+    else
+      return "s"; 
+  }
   function update_D1_D2(kept_value, invested) {
+    const pl_kept = isPlural(kept_value);
+    const pl_invested = isPlural(invested)
     const yellow =
       kept_value +
-      " jetons gardés + 3 x " +
+      " jeton"+ pl_kept + " conservé" + pl_kept + " + 3 x " +
       invested +
-      " jetons gagnés = " +
+      " jeton" + pl_invested + " gagné" + pl_invested + " = " +
       (kept_value + 3 * invested);
 
-    const purple = kept_value + " jetons gardés";
+    const purple = kept_value + " jeton"+ pl_kept +" conservé" + pl_kept;
 
     return { yellow, purple };
   }
 
   function update_D3_D4(kept_value, invested) {
     let yellow, purple;
-    if (invested == "0") {
+    const pl_kept = isPlural(kept_value);
+    const pl_invested = isPlural(invested);
+
+    if ( invested == "0" || invested == "") {
       yellow = purple = "Vous perdez les 10 jetons";
     } else {
-      yellow = purple = "Vous perdez " + kept_value + " jetons non-investis";
+      yellow = purple = "Vous perdez " + kept_value + " jeton" + pl_kept + " non-investi" + pl_kept;
+
+      yellow += " et conservez " + invested +
+        " jeton" + pl_invested + " investi" + pl_invested 
       purple +=
         " + 3 x " +
         invested +
-        " jetons investis = " +
+        " jeton" + pl_invested + " investi" + pl_invested + " = " +
         (kept_value + 3 * invested) +
         " jetons perdus";
     }

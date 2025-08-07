@@ -15,6 +15,15 @@
 
 <p><strong style="color: red">Numéro de la décision selon cahier des charges : {{ real_current_decision }}</strong></p>
 
+{{ if player.confirmed_decision_count != 1 }}
+
+<div class="alert-box">
+La décision donnant lieu à votre rémunération finale n’étant tirée au sort parmi toutes vos décisions qu’à la fin de la première partie, 
+vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}</strong> initiaux.
+</div>
+
+{{ endif }}
+
 <div class="container">
   <div class="info-card">
     <div class="intro-section">
@@ -28,11 +37,11 @@
 
           <div class="option-item">
               <div class="option-icon">💰</div>
-              <div class="option-text">garder les {{ C.MAX_INVESTMENT }} jetons</div>
+              <div class="option-text">conserver les {{ C.MAX_INVESTMENT }} jetons</div>
           </div>
           <div class="option-item">
               <div class="option-icon">🎲</div>
-              <div class="option-text">OU investir tout ou une partie des {{ C.MAX_INVESTMENT }} jetons dans un jeu risqué</div>
+              <div class="option-text">OU investir tout ou une partie des {{ C.MAX_INVESTMENT }} jetons dans un jeu de hasard</div>
           </div>
 
         {{ else }}
@@ -43,7 +52,7 @@
           </div>
           <div class="option-item">
               <div class="option-icon">🎲</div>
-              <div class="option-text">OU investir tout ou une partie des {{ C.MAX_INVESTMENT }} jetons dans un jeu risqué</div>
+              <div class="option-text">OU investir tout ou une partie des {{ C.MAX_INVESTMENT }} jetons dans un jeu de hasard</div>
           </div>
 
         {{ endif }}
@@ -53,11 +62,11 @@
 
     <div class="game-section">
 
-      <h5>🔍 Comment fonctionne le jeu risqué ?</h5>
+      <h5>🔍 Comment fonctionne le jeu de hasard ?</h5>
 
       <p class="game-description">
 
-        Un tirage au sort est effectué dans une urne contenant <strong>{{ C.BALL_NUMBER }} boules :</strong>
+        Une urne contient <strong>{{ C.BALL_NUMBER }} boules :</strong>
 
         {{ if real_current_decision == 1 or real_current_decision == 3 }}
 
@@ -65,7 +74,7 @@
 
         {{ else }}
 
-          des boules <strong>JAUNES</strong> <span class="ball yellow"></span> et des boules <strong>VIOLETTES</strong> <span class="ball purple"></span>.
+          des boules <strong>JAUNES</strong> <span class="ball yellow"></span> et/ou des boules <strong>VIOLETTES</strong> <span class="ball purple"></span>.
 
         {{ endif }}
       
@@ -77,13 +86,16 @@
     
      {{ if real_current_decision == 1 or real_current_decision == 3 }} 
 
-        <p>⚠️ Avec <strong>autant de boules</strong> de chaque couleur, vous avez donc <strong> 1 chance sur 2 </strong> de tirer chaque couleur :</p>
+        <p>⚠️ Avec <strong>autant de boules</strong> de chaque couleur, vous avez donc <strong> 1 chance sur 2 </strong> de tirer chaque couleur.</p>
 
      {{ else }} 
 
-        <p>⚠️ Vous ne savez pas combien il y a de boules de chaque couleur. Il peut y avoir entre 0 et {{ ball_number_per_color }} boules <span class="ball yellow"></span> et entre 0 et {{ ball_number_per_color }} boules <span class="ball purple"></span>.</p>
+        <p>⚠️ Vous ne savez pas combien il y a de boules de chaque couleur dans l'urne. Il peut y avoir entre 0 et {{ C.BALL_NUMBER }} boules <span class="ball yellow"></span> 
+          et entre 0 et {{ C.BALL_NUMBER }} boules <span class="ball purple"></span>.</p>
 
      {{ endif }}
+
+     <p>On tire au hasard une boule de l'urne. Deux possibilités se présentent à vous :</p>
 
      {{ if real_current_decision == 1 or real_current_decision == 2 }} 
 
@@ -101,7 +113,7 @@
 
         </div>
 
-        <p><strong>💡 Exemple :</strong> Avec <strong>4 jetons</strong> investis (et <strong>6 jetons</strong>  gardés) :</p>
+        <p><strong>💡 Exemple :</strong> Avec <strong>4 jetons</strong> investis (et <strong>6 jetons</strong>  conservés) :</p>
         <ul>
           <li><span class="ball yellow"></span> tirage <strong>JAUNE</strong> : vous gagnez 3 × 4 jetons = <strong>12 jetons</strong></li>
 
@@ -122,28 +134,28 @@
 
             <div class="option-item">
               <div class="option-icon"><span class="ball yellow"></span></div>
-              <div class="option-text">tirage <strong>JAUNE</strong> : vous <strong>réduisez</strong> votre perte et récupérez les jetons investis</div>
+              <div class="option-text">tirage <strong>JAUNE</strong> : vous récupérez les jetons investis et réduisez donc votre perte d’autant.</div>
             </div>
 
             <div class="option-item">
               <div class="option-icon"><span class="ball purple"></span></div>
-              <div class="option-text">tirage <strong>VIOLET</strong> : vous <strong>aggravez</strong> votre perte et perdez <strong>3 fois les jetons investis</strong> (en plus des jetons non investis)</div>
+              <div class="option-text">tirage <strong>VIOLET</strong> : vous perdez <strong>3 fois les jetons investis</strong> (en plus des jetons non investis) et <strong>aggravez</strong> donc votre perte d’autant</div>
             </div>
 
           </div>
 
-          <p><strong>💡 Exemple :</strong> Avec 4 jetons investis (et 6 jetons gadés).</p>
+          <p><strong>💡 Exemple :</strong> Avec 4 jetons investis (et 6 jetons non investis).</p>
           <ul>
             <li><strong><span class="ball yellow"></span> tirage JAUNE :</strong> vous récupérez les 4 jetons investis</li>
 
             <ul>
-                <li>Total perdu: 6 jetons</li>
+                <li>Total perdu: 6 jetons au lieu des 10 jetons initiaux</li>
             </ul>
 
             <li><strong><span class="ball purple"></span> tirage VIOLET :</strong> vous perdez 3 x 4 = 12 jetons supplémentaires</li>
 
             <ul>
-                <li>Vote total : 12 + 6 = 18 jetons</li>
+                <li>Total perdu : 12 + 6 (jetons non investis) = 18 jetons</li>
             </ul>
           </ul>
 
@@ -155,7 +167,7 @@
  </div>
 
  <div class="button-container">
-   {{ next_button }}
+    {{ next_button }}
  </div>
 
 </div>

@@ -16,24 +16,23 @@
 
 <div class="info-wrapper">
 
-    <p class="welcome-text">
-        Dans cette partie, vous devrez faire des choix avec des jetons que vous allez gagner.
-    </p>
-
-
     <h3>Cette étape comprend :</h3>
     <ul class="steps-list">
         <li>
             ✅ Une tâche rémunérée qui vous permettra de gagner 
             <strong class="highlight">{{ C.ENDOWMENT | to0 }}</strong>
         </li>
-        <li>🎲 Une série de jeux de décisions où le hasard joue un rôle.</li>
+        <li>🎲 Une série de décisions mettant en jeu tout ou partie des {{ C.ENDOWMENT | to0 }} que vous aurez gagnés.</li>
+        <li>
+            Pour le calcul de vos gains finaux, le taux de conversion sera le suivant : 1 jeton = {{ rate }} centimes d’euros. <br>
+            Ainsi, {{ C.ENDOWMENT | to0 }} valent {{ exemple1_euros }} euros et {{ exemple2 | to0 }} valent {{ exemple2_euros }} euros. 
+        </li>
     </ul>
 
     <div class="alert-box">
-        💡 À la fin de cette série de jeux, <strong>une seule de vos décisions</strong> est tirée au sort pour déterminer votre gain ou perte final.
-        <br>
-        <span class="alert-note">Cela signifie que chaque décision compte : il est donc important de répondre à chaque décision avec attention.</span>
+        <p>💡 À la fin de cette série de jeux, <strong>une seule de vos décisions</strong> est tirée au sort pour déterminer votre gain ou perte final.</p>
+        
+        <p><span class="alert-note">Cela signifie que chaque décision compte : il est donc important de répondre à chaque décision avec attention.</span></p>
     </div>
 
     <div class="button-container">
