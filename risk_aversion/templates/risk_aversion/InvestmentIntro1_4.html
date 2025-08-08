@@ -18,8 +18,8 @@
 {{ if player.confirmed_decision_count != 1 }}
 
 <div class="alert-box">
-La décision donnant lieu à votre rémunération finale n’étant tirée au sort parmi toutes vos décisions qu’à la fin de la première partie, 
-vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}</strong> initiaux.
+Le tirage au sort de la décision donnant lieu à votre rémunération finale n’a lieu qu’à la fin de tous les jeux. 
+Vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}</strong> initiaux.
 </div>
 
 {{ endif }}
@@ -115,16 +115,16 @@ vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}
 
         <p><strong>💡 Exemple :</strong> Avec <strong>4 jetons</strong> investis (et <strong>6 jetons</strong>  conservés) :</p>
         <ul>
-          <li><span class="ball yellow"></span> tirage <strong>JAUNE</strong> : vous gagnez 3 × 4 jetons = <strong>12 jetons</strong></li>
+          <li><span class="ball yellow"></span> tirage <strong>JAUNE</strong> : vous gagnez 3 x 4 jetons = <strong>12 jetons</strong></li>
 
           <ul>
-              <li>Après tirage, vous avez donc <strong>18 jetons</strong></li>
+              <li>Après tirage, vous avez donc 12+6 (jetons conservés) = <strong>18 jetons</strong></li>
           </ul>
 
           <li><span class="ball purple"></span> tirage <strong>VIOLET</strong> : vous perdez les 4 jetons investis et ne gagnez donc rien</li>
 
           <ul>
-              <li>Après tirage, vous avez donc <strong>6 jetons</strong></li>
+              <li>Après tirage, il vous reste donc les <strong>6 jetons conservés</strong></li>
           </ul>
         </ul>
 
@@ -134,7 +134,7 @@ vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}
 
             <div class="option-item">
               <div class="option-icon"><span class="ball yellow"></span></div>
-              <div class="option-text">tirage <strong>JAUNE</strong> : vous récupérez les jetons investis et réduisez donc votre perte d’autant.</div>
+              <div class="option-text">tirage <strong>JAUNE</strong> : vous <strong>récupérez les jetons investis</strong> et <strong>réduisez</strong> donc votre perte d’autant.</div>
             </div>
 
             <div class="option-item">
@@ -144,18 +144,18 @@ vous disposez donc toujours à ce stade de vos <strong>{{ player.payoff | to0 }}
 
           </div>
 
-          <p><strong>💡 Exemple :</strong> Avec 4 jetons investis (et 6 jetons non investis).</p>
+          <p><strong>💡 Exemple :</strong> Avec 4 jetons investis (et 6 jetons non-investis).</p>
           <ul>
-            <li><strong><span class="ball yellow"></span> tirage JAUNE :</strong> vous récupérez les 4 jetons investis</li>
+            <li><strong><span class="ball yellow"></span> tirage JAUNE :</strong> vous <strong>récupérez</strong> les 4 jetons investis</li>
 
             <ul>
-                <li>Total perdu: 6 jetons au lieu des 10 jetons initiaux</li>
+                <li>Total perdu: les 6 jetons non-investis (au lieu des 10 jetons initiaux)</li>
             </ul>
 
-            <li><strong><span class="ball purple"></span> tirage VIOLET :</strong> vous perdez 3 x 4 = 12 jetons supplémentaires</li>
+            <li><strong><span class="ball purple"></span> tirage VIOLET :</strong> vous <strong>perdez</strong> 3 x 4 = 12 jetons</li>
 
             <ul>
-                <li>Total perdu : 12 + 6 (jetons non investis) = 18 jetons</li>
+                <li>Total perdu : 12 + 6 (jetons non-investis) = 18 jetons (au lieu des 10 jetons initiaux)</li>
             </ul>
           </ul>
 

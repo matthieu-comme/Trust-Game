@@ -65,12 +65,9 @@
   function update_D1_D2(kept_value, invested) {
     const pl_kept = isPlural(kept_value);
     const pl_invested = isPlural(invested)
-    const yellow =
-      kept_value +
-      " jeton"+ pl_kept + " conservé" + pl_kept + " + 3 x " +
-      invested +
-      " jeton" + pl_invested + " gagné" + pl_invested + " = " +
-      (kept_value + 3 * invested);
+    const yellow = kept_value + " jeton"+ pl_kept + " conservé" + pl_kept + 
+    " + 3 x " + invested + " jeton" + pl_invested + " gagné" + pl_invested + " = " +
+      (kept_value + 3 * invested) + " jetons";
 
     const purple = kept_value + " jeton"+ pl_kept +" conservé" + pl_kept;
 
@@ -86,15 +83,11 @@
       yellow = purple = "Vous perdez les 10 jetons";
     } else {
       yellow = purple = "Vous perdez " + kept_value + " jeton" + pl_kept + " non-investi" + pl_kept;
+      stringEnd = " (au lieu des " + max_investment + " jetons initiaux)";
 
-      yellow += " et conservez " + invested +
-        " jeton" + pl_invested + " investi" + pl_invested 
-      purple +=
-        " + 3 x " +
-        invested +
-        " jeton" + pl_invested + " investi" + pl_invested + " = " +
-        (kept_value + 3 * invested) +
-        " jetons perdus";
+      yellow += stringEnd;
+
+      purple +=" + 3 x " + invested + " jeton" + pl_invested + " investi" + pl_invested + " ="+ kept_value + "+"+ 3*invested + "="+(kept_value + 3 * invested) + " jetons perdus" + stringEnd;
     }
     return { yellow, purple };
   }
