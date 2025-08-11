@@ -163,10 +163,21 @@ class Player(BasePlayer):
 
     # conserve les infos importantes concernant la décision tirée au sort pour les afficher à la toute fin de l'expérience
     def set_participant_vars(self):
+        bc = self.ball_color
+        """
+        if bc is "yellow":
+            bc = "jaune"
+        elif bc is "purple":
+            bc = "violette"
+        else:
+            bc = "bleue"
+        """
+
         vars = self.participant.vars
         vars["chosen_decision"] = self.chosen_decision
         vars["invested"] = getattr(self, f"inv{self.real_chosen_decision}")
-        vars["ball_color"] = self.ball_color
+        vars["ball_color"] = bc
+        vars['initial_amount'] = C.ENDOWMENT
         vars["profit"] = self.profit
         vars["payoff"] = self.payoff
 
@@ -502,7 +513,7 @@ class Fin(Page):
 
     def vars_for_template(player: Player):
         return getTemplate(player) | {
-            "initial_amount": player.payoff - player.profit,
+            "initial_amount": C.ENDOWMENT,
             "invested": getattr(player, f"inv{player.real_chosen_decision}"),
             "ball_color": player.ball_color,
             "profit": player.profit,

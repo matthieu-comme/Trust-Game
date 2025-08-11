@@ -13,17 +13,22 @@ SESSION_CONFIGS = [
         display_name="Mesure d'aversion au risque",
         num_demo_participants=1,
         app_sequence=["risk_aversion"],
-        real_world_currency_per_point=0.50,
     ),
     dict(
-        name="trust_game_test",
-        display_name="Trust Game Classique",
+        name="test_results",
+        display_name="Test Results",
+        num_demo_participants=1,
+        app_sequence=["risk_aversion", "results"],
+    ),
+    dict(
+        name="trust_game",
+        display_name="Trust Game",
         num_demo_participants=PLAYERS_PER_GROUP,
         app_sequence=["trust_game"],
     ),
     dict(
         name="test_questionnaire",
-        display_name="Test Questionnaire IA",
+        display_name="Questionnaire",
         num_demo_participants=20,
         app_sequence=["questionnaire"],
     ),
@@ -37,21 +42,20 @@ SESSION_CONFIGS = [
         name="groupe_1",
         display_name="Groupe 1",
         num_demo_participants=PLAYERS_PER_GROUP,
-        app_sequence=["questionnaire", "risk_aversion", "trust_game"],
+        app_sequence=["questionnaire", "risk_aversion", "trust_game", "results"],
     ),
     dict(
         name="groupe_2",
         display_name="Groupe 2",
         num_demo_participants=PLAYERS_PER_GROUP,
-        app_sequence=["risk_aversion", "questionnaire", "trust_game"],
+        app_sequence=["risk_aversion", "questionnaire", "trust_game", "results"],
     ),
     dict(
         name="groupe_3",
         display_name="Groupe 3",
         num_demo_participants=PLAYERS_PER_GROUP,
-        app_sequence=["questionnaire", "trust_game", "risk_aversion"],
+        app_sequence=["questionnaire", "trust_game", "risk_aversion", "results"],
     ),
-
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
@@ -60,7 +64,7 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=1.00, participation_fee=0.00, doc=""
+    real_world_currency_per_point=0.50, participation_fee=0.00, doc=""
 )
 
 PARTICIPANT_FIELDS = []

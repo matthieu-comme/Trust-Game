@@ -1,0 +1,17 @@
+{{ block title }} Résultats {{ endblock }}
+
+{{ block content }}
+
+<p><strong>Résultats du tirage au sort:</strong></p>
+<ul>
+  <li>N° Décision : {{ chosen_decision }}</strong></li>
+  <li>Choix lors de cette décision : {{ invested }}</li>
+  <li>Boule tirée : {{ ball_color }}</li>
+  <li>Somme initiale : {{ initial_amount | to0 }}</li>
+  <li>Profit associé : {{ profit | to0 }}</li>
+  <li>Votre total de jetons: {{ initial_amount | to0 }} + {{ profit | to0 }} = {{ payoff | to0 }}</li>
+</ul>
+    {{ next_button }}
+{{ endblock }}
+
+

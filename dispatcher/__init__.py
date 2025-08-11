@@ -14,9 +14,9 @@ class C(BaseConstants):
     USERNAME = "admin"
     PASSWORD = "admin"
     # insérer le code du session-wide link, et non le code de la session
-    CODE_GROUPE_1 = "lovozeka"
-    CODE_GROUPE_2 = "	sidozuno"
-    CODE_GROUPE_3 = "pirihigu"
+    CODE_GROUPE_1 = "vudisufe"
+    CODE_GROUPE_2 = "	tafefoho"
+    CODE_GROUPE_3 = "semitolu"
 
     """
     PERMUTATIONS = [
@@ -127,7 +127,7 @@ class Welcome(Page):
 
     def vars_for_template(player: Player):
         return {
-            #"player_vars": player.participant.vars,
+            # "player_vars": player.participant.vars,
             "group_number": player.group_number,
             # "code": get_session_code(player),
             # "total_participants": len(player.session.get_participants()),

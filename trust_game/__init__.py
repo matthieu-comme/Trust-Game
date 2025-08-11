@@ -49,10 +49,10 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     # Réponses des participants
-    q1_b_receive = models.IntegerField()
-    q2_a_get_back = models.IntegerField()
-    q3_a_final = models.IntegerField()
-    q3_b_final = models.IntegerField()
+    q1_b_receive = models.IntegerField(label="")
+    q2_a_get_back = models.IntegerField(label="")
+    q3_a_final = models.IntegerField(label="")
+    q3_b_final = models.IntegerField(label="")
     q4_true_false = models.StringField(
         label="", choices=["Vrai", "Faux"], widget=widgets.RadioSelect
     )
@@ -294,6 +294,7 @@ class GamePlay(Page):
     def vars_for_template(player: Player):
         return {
             "has_chat_gpt": player.gpt_behavior != C.NO_GPT_BEHAVIOR,
+            "gpt_behavior": player.gpt_behavior,
             "gpt_history": player.gpt_history,
             "chat_history": player.chat_history,
         }

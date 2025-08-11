@@ -71,13 +71,22 @@ class Player(BasePlayer):
         blank=True,
     )
     maths = models.IntegerField(
-        label="Mathématiques", widget=widgets.RadioSelect, choices=C.MATIERE_CHOICES, blank=True
+        label="Mathématiques",
+        widget=widgets.RadioSelect,
+        choices=C.MATIERE_CHOICES,
+        blank=True,
     )
     anglais = models.IntegerField(
-        label="Anglais", widget=widgets.RadioSelect, choices=C.MATIERE_CHOICES, blank=True
+        label="Anglais",
+        widget=widgets.RadioSelect,
+        choices=C.MATIERE_CHOICES,
+        blank=True,
     )
     histoire = models.IntegerField(
-        label="Histoire", widget=widgets.RadioSelect, choices=C.MATIERE_CHOICES, blank=True
+        label="Histoire",
+        widget=widgets.RadioSelect,
+        choices=C.MATIERE_CHOICES,
+        blank=True,
     )
     ck_excel = models.StringField(blank=True)
     ck_powerpoint = models.StringField(blank=True)
@@ -200,6 +209,10 @@ class Player(BasePlayer):
 # ==== PAGES ====
 
 
+class Welcome(Page):
+    pass
+
+
 class TestInput1(Page):
     form_model = "player"
     form_fields = [
@@ -231,19 +244,21 @@ class TestInput2(Page):
             "parle_es": player.parle_es,
         }
 
+
 class TestInput3(Page):
     form_model = "player"
-    form_fields = ['ck_excel', 'ck_powerpoint', 'ck_python' ]
+    form_fields = ["ck_excel", "ck_powerpoint", "ck_python"]
 
     def vars_for_template(player: Player):
 
         return {
-            "maths": player.field_maybe_none('maths'),
-            "anglais": player.field_maybe_none('anglais'),
-            "histoire": player.field_maybe_none('histoire'),
+            "maths": player.field_maybe_none("maths"),
+            "anglais": player.field_maybe_none("anglais"),
+            "histoire": player.field_maybe_none("histoire"),
         }
 
-class Welcome(Page):
+
+class TestInput4(Page):
     def vars_for_template(player: Player):
         return {
             "excel": player.ck_excel,
@@ -357,14 +372,15 @@ class Conclusion(Page):
 
 
 page_sequence = [
+    Welcome,
     TestInput1,
     TestInput2,
     TestInput3,
-    Welcome,
-    Question1,
-    Question2,
-    Question3,
-    Question4,
-    Question5,
-    Conclusion,
+    TestInput4,
+    # Question1,
+    # Question2,
+    # Question3,
+    # Question4,
+    # Question5,
+    # Conclusion,
 ]
