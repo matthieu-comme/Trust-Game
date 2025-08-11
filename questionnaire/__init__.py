@@ -29,6 +29,7 @@ class C(BaseConstants):
         [4, "Beaucoup"],
         [5, "Énormément"],
     ]
+    MATIERE_CHOICES = [[1, "Faible"], [2, "Moyen"], [3, "Bon"], [4, "Excellent"]]
 
 
 class Subsession(BaseSubsession):
@@ -39,9 +40,50 @@ class Group(BaseGroup):
     pass
 
 
+# supprimer blank=True si on veut que les champs soient obligatoirement remplis
 class Player(BasePlayer):
+    reponse_courte = models.StringField(label="Quel est votre prénom ?", blank=True)
+    paragraphe = models.LongStringField(
+        label="Expliquez pourquoi vous êtes intéréssé(e) par ce programme :", blank=True
+    )
+    radio = models.StringField(
+        label="Quel est votre sexe ?",
+        choices=[["H", "Homme"], ["F", "Femme"], ["N", "Préfère ne rien dire"]],
+        widget=widgets.RadioSelectHorizontal,
+        blank=True,
+    )
+    parle_fr = models.BooleanField(
+        label="Français", blank=True, widget=widgets.CheckboxInput
+    )
+    parle_en = models.BooleanField(
+        label="Anglais", blank=True, widget=widgets.CheckboxInput
+    )
+    parle_de = models.BooleanField(
+        label="Allemand", blank=True, widget=widgets.CheckboxInput
+    )
+    parle_es = models.BooleanField(
+        label="Espagnol", blank=True, widget=widgets.CheckboxInput
+    )
 
-    player_name = models.StringField(label="Veuillez entrer votre nom")
+    liste_deroulante = models.StringField(
+        label="Quel est votre pays de résidence ?",
+        choices=["France", "Belgique", "Suisse"],
+        blank=True,
+    )
+    maths = models.IntegerField(
+        label="Mathématiques", widget=widgets.RadioSelect, choices=C.MATIERE_CHOICES, blank=True
+    )
+    anglais = models.IntegerField(
+        label="Anglais", widget=widgets.RadioSelect, choices=C.MATIERE_CHOICES, blank=True
+    )
+    histoire = models.IntegerField(
+        label="Histoire", widget=widgets.RadioSelect, choices=C.MATIERE_CHOICES, blank=True
+    )
+    ck_excel = models.StringField(blank=True)
+    ck_powerpoint = models.StringField(blank=True)
+    ck_python = models.StringField(blank=True)
+
+    player_name = models.StringField
     go_back = models.BooleanField(initial=False)
     # Q1
     ai_knowledge = models.IntegerField(
@@ -158,6 +200,58 @@ class Player(BasePlayer):
 # ==== PAGES ====
 
 
+class TestInput1(Page):
+    form_model = "player"
+    form_fields = [
+        "reponse_courte",
+        "paragraphe",
+        "radio",
+        "liste_deroulante",
+        "parle_fr",
+        "parle_en",
+        "parle_de",
+        "parle_es",
+    ]
+
+
+class TestInput2(Page):
+    form_model = "player"
+    form_fields = ["maths", "anglais", "histoire"]
+
+    def vars_for_template(player: Player):
+
+        return {
+            "reponse_courte": player.field_maybe_none("reponse_courte"),
+            "paragraphe": player.field_maybe_none("paragraphe"),
+            "radio": player.field_maybe_none("radio"),
+            "liste_deroulante": player.field_maybe_none("liste_deroulante"),
+            "parle_fr": player.parle_fr,
+            "parle_en": player.parle_en,
+            "parle_de": player.parle_de,
+            "parle_es": player.parle_es,
+        }
+
+class TestInput3(Page):
+    form_model = "player"
+    form_fields = ['ck_excel', 'ck_powerpoint', 'ck_python' ]
+
+    def vars_for_template(player: Player):
+
+        return {
+            "maths": player.field_maybe_none('maths'),
+            "anglais": player.field_maybe_none('anglais'),
+            "histoire": player.field_maybe_none('histoire'),
+        }
+
+class Welcome(Page):
+    def vars_for_template(player: Player):
+        return {
+            "excel": player.ck_excel,
+            "powerpoint": player.ck_powerpoint,
+            "python": player.ck_python,
+        }
+
+
 class Question1(Page):
     form_model = "player"
     form_fields = ["ai_knowledge"]
@@ -258,16 +352,14 @@ class Login(Page):
     form_fields = ["player_name"]
 
 
-class Welcome(Page):
-    # Cette page affichera le message de bienvenue avec le nom du joueur
-    pass
-
-
 class Conclusion(Page):
     pass
 
 
 page_sequence = [
+    TestInput1,
+    TestInput2,
+    TestInput3,
     Welcome,
     Question1,
     Question2,
