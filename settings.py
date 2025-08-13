@@ -1,6 +1,6 @@
 from os import environ
 
-PLAYERS_PER_GROUP = 16  # 8 traitements, 2 joueurs par groupe
+PLAYERS_PER_GROUP = 2  # le TG se joue à 2
 SESSION_CONFIGS = [
     dict(
         name="chatgpt",
@@ -29,7 +29,7 @@ SESSION_CONFIGS = [
     dict(
         name="test_questionnaire",
         display_name="Questionnaire",
-        num_demo_participants=20,
+        num_demo_participants=1,
         app_sequence=["questionnaire"],
     ),
     dict(
@@ -64,7 +64,7 @@ SESSION_CONFIGS = [
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = dict(
-    real_world_currency_per_point=0.50, participation_fee=0.00, doc=""
+    real_world_currency_per_point=0.50, participation_fee=10.00, doc=""
 )
 
 PARTICIPANT_FIELDS = []

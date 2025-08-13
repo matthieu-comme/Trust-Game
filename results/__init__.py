@@ -32,7 +32,6 @@ class Intro(Page):
 class Results(Page):
     def vars_for_template(player: Player):
         vars = player.participant.vars
-        print(vars)
         return {
             "chosen_decision": vars["chosen_decision"],
             "invested": vars["invested"],

@@ -23,7 +23,9 @@ class C(BaseConstants):
     BOT_PREFIX = "<strong>GPT:</strong> "  # pareil pour gpt
     CHAT_SEPARATOR = "<br>"  # séparateur entre 2 messages
     NO_GPT_BEHAVIOR = "Non"
-    BEHAVIORS = [NO_GPT_BEHAVIOR, "Neutre", "Stratège", "Altruiste"]
+    # Modifier les deux paramètres suivants pour obtenir le traitement souhaité
+    HAS_CHEAP_TALK = True
+    GPT_BEHAVIOR = "Stratège"  # = NO_GPT_BEHAVIOR pour désactiver le chat avec IA
 
 
 class Subsession(BaseSubsession):
@@ -62,11 +64,12 @@ class Player(BasePlayer):
     message = models.LongStringField(blank=True)
     chat_history = models.LongStringField(initial="")
     gpt_history = models.LongStringField(initial="")
-    gpt_behavior = models.StringField(initial="")  # comportement du bot
-    # = vrai si discussion avec l'autre joueur activée
-    has_cheap_talk = models.BooleanField()
+
+    gpt_behavior = models.StringField(initial=C.GPT_BEHAVIOR)
+    has_cheap_talk = models.BooleanField(initial=C.HAS_CHEAP_TALK)
 
 
+"""
 # définis si le joueur a le cheap talk et / ou chatgpt, avec son attitude
 # sur 8 duos ça fait par exemple : (has_cheap_talk, gpt_behavior)
 # (False,Non), (False,Neutre), (False,Stratège), (False,Altruise), (True,Non), (True,Neutre), (True,Stratège), (True,Altruise)
@@ -80,6 +83,7 @@ def set_chat_options(player: Player):
 
     # la deuxième moitié des joueurs a le cheap talk
     player.has_cheap_talk = id > nb_participants // 2
+"""
 
 
 class BaseQuiz(Page):
@@ -145,14 +149,11 @@ class QuizExample1(BaseQuiz):
 class Instructions(Page):
 
     def vars_for_template(player: Player):
-        set_chat_options(player)
+        # set_chat_options(player)
         return {
             "gpt behavior": player.gpt_behavior,
             "has cheap talk": player.has_cheap_talk,
         }
-
-    # def before_next_page(player: Player, timeout_happened):
-    #    set_chat_options(player)
 
 
 # gérer les messages du chat entre joueurs
@@ -178,7 +179,10 @@ def chat_with_gpt(player: Player, data):
     # historique sous forme de liste pour la requête
     messages_list = [  # c'est ici qu'on met les consignes pour chatgpt
         {"role": "system", "content": "Tu réponds en une à deux phrases simples."},
-        {"role": "system", "content": f"Tu vas me parler de {player.gpt_behavior}"},
+        {
+            "role": "system",
+            "content": f"Je joue au trust game. Donne moi des conseils pour favoriser un comportement {player.gpt_behavior}",
+        },
     ]
     history = player.gpt_history or ""
 

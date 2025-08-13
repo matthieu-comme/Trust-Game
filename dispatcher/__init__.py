@@ -7,16 +7,16 @@ from bs4 import BeautifulSoup
 
 class C(BaseConstants):
     NAME_IN_URL = "dispatcher"
-    PLAYERS_PER_GROUP = 16
+    PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
     NUM_APPS = 3
     BASE_URL = "http://localhost:8000"
     USERNAME = "admin"
     PASSWORD = "admin"
     # insérer le code du session-wide link, et non le code de la session
-    CODE_GROUPE_1 = "vudisufe"
-    CODE_GROUPE_2 = "	tafefoho"
-    CODE_GROUPE_3 = "semitolu"
+    CODE_GROUPE_1 = "varabise"
+    CODE_GROUPE_2 = "	dipogase    "
+    CODE_GROUPE_3 = "kopojumi"
 
     """
     PERMUTATIONS = [
