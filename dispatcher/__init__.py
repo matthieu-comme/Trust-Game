@@ -1,4 +1,6 @@
 from otree.api import *
+from uuid import uuid4
+from datetime import datetime
 
 
 class C(BaseConstants):
@@ -13,6 +15,7 @@ class C(BaseConstants):
     CODE_GROUPE_1 = "varabise"
     CODE_GROUPE_2 = "	dipogase    "
     CODE_GROUPE_3 = "kopojumi"
+    ORDRES_ETAPES = ["Q/A/TG", "A/Q/TG", "Q/TG/A"]
 
 
 class Subsession(BaseSubsession):
@@ -24,10 +27,27 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    date = models.StringField()
+    id_participant = models.StringField()
     group_number = models.IntegerField()
+    ordre_etapes = models.StringField()
 
 
 # FONCTIONS
+
+
+def set_vars(player: Player):
+    # répartit les joueurs 2 par 2 dans les groupes 1 à 3
+    n = ((player.participant.id_in_session - 1) // 2) % 3 + 1
+    player.group_number = n
+    player.ordre_etapes = C.ORDRES_ETAPES[n - 1]
+
+    id = str(uuid4())[:8]  # id unique 8 caractères
+    date = datetime.now().strftime("%d-%b-%y")
+
+    player.date = date
+    player.id_participant = id
+    player.participant.vars["id_participant"] = id
 
 
 def get_code(player: Player):
@@ -44,18 +64,11 @@ def get_code(player: Player):
 
 class Welcome(Page):
 
-    def is_displayed(player: Player):
-        # répartit les joueurs 2 par 2 dans les groupes 1 à 3
-        player.group_number = ((player.participant.id_in_session - 1) // 2) % 3 + 1
-        return True
-
     def vars_for_template(player: Player):
-        return {
-            "group_number": player.group_number,
-        }
+        pass
 
     def before_next_page(player: Player, timeout_happened):
-        pass
+        set_vars(player)
 
 
 class Dispatch(Page):

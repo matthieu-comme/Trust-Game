@@ -9,6 +9,9 @@ Description :
 - une série de jeux de décisions où le hasard joue un rôle
 - une seule des décisions est tirée au sort pour déterminer le gain ou la perte.
 
+Suite à des modifications de dernière minute, j'ai dû rajouter des fonctionnalités à la volée, en appliquant des rustines par-ci par là. 
+J'en suis conscient mais je n'ai pas le temps de refaire proprement.
+
 Auteur : Matthieu Comme (LEFMI)
 Version : oTree 5+
 """
@@ -28,6 +31,7 @@ class C(BaseConstants):
     )
     BALL_NUMBER = 60  # nombre total de boules dans l'urne
     CONVERSION_RATE = 0.5
+    # RG, AG, RP, AP, CRG, CAG, CRP, CAP
 
 
 class Subsession(BaseSubsession):
@@ -40,36 +44,25 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
 
-    # chiffre à compter lors de la tâche, généré dans GeneralInfo
-    target_digit = models.IntegerField(initial=0)
-    pi_count = models.IntegerField(label="Combien de fois ce chiffre apparaît-il ?")
-
-    # l'ordre des decisions 1 à 8 étant randomisés, ces indices sont ceux correspondant au cahier des charges
-    real_index_1 = models.IntegerField(initial=-1)
-    real_index_2 = models.IntegerField(initial=-1)
-    real_index_3 = models.IntegerField(initial=-1)
-    real_index_4 = models.IntegerField(initial=-1)
-    real_index_5 = models.IntegerField(initial=-1)
-    real_index_6 = models.IntegerField(initial=-1)
-    real_index_7 = models.IntegerField(initial=-1)
-    real_index_8 = models.IntegerField(initial=-1)
-
-    # compteur suivant l'avancée dans les decisions
-    current_decision = models.IntegerField(initial=1)
-
-    confirmed_decision_count = models.IntegerField(initial=1)
-    # indice relatif de la décision tirée au sort
-    chosen_decision = models.IntegerField(initial=-1)
-
-    # indice réel de la décision choisie
-    real_chosen_decision = models.IntegerField(initial=-1)
+    # ces indices facilitent la lecture dans la base de données (ils sont = aux real_index)
+    # sans devoir changer toute la structure logique
+    # risque gain, ambiguite gain, ..., complement risque perte, complement ambiguite perte
+    ordre_rg = models.IntegerField(initial=-1)
+    ordre_ag = models.IntegerField(initial=-1)
+    ordre_rp = models.IntegerField(initial=-1)
+    ordre_ap = models.IntegerField(initial=-1)
+    ordre_crg = models.IntegerField(initial=-1)
+    ordre_cag = models.IntegerField(initial=-1)
+    ordre_crp = models.IntegerField(initial=-1)
+    ordre_cap = models.IntegerField(initial=-1)
 
     # Sommes investies à chaque décision
+    # l'ordre suit celui défini juste au dessus
     inv1 = models.IntegerField(
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
         initial=-1,
         label="Je décide d'investir :",
-        blank=False
+        blank=False,
     )
     inv2 = models.IntegerField(
         choices=[(i, str(i)) for i in range(0, C.MAX_INVESTMENT + 1)],
@@ -99,8 +92,32 @@ class Player(BasePlayer):
         choices=["A", "B", "C", "D"], label="Je choisis le tirage :"
     )
 
+    # indice réel de la décision choisie
+    real_chosen_decision = models.IntegerField(initial=-1)
+
     ball_color = models.StringField(initial="")  # couleur de la boule
     profit = models.CurrencyField(initial=0)  # profit décision
+
+    # chiffre à compter lors de la tâche, généré dans GeneralInfo
+    target_digit = models.IntegerField(initial=0)
+    pi_count = models.IntegerField(label="Combien de fois ce chiffre apparaît-il ?")
+
+    # l'ordre des decisions 1 à 8 étant randomisés, ces indices sont ceux correspondant au cahier des charges
+    real_index_1 = models.IntegerField(initial=-1)
+    real_index_2 = models.IntegerField(initial=-1)
+    real_index_3 = models.IntegerField(initial=-1)
+    real_index_4 = models.IntegerField(initial=-1)
+    real_index_5 = models.IntegerField(initial=-1)
+    real_index_6 = models.IntegerField(initial=-1)
+    real_index_7 = models.IntegerField(initial=-1)
+    real_index_8 = models.IntegerField(initial=-1)
+
+    # compteur suivant l'avancée dans les decisions
+    current_decision = models.IntegerField(initial=1)
+
+    confirmed_decision_count = models.IntegerField(initial=1)
+    # indice relatif de la décision tirée au sort
+    chosen_decision = models.IntegerField(initial=-1)
 
     # retourne l'indice réel de décision, conforme au cahier des charges
     def get_real_index(self, i=None) -> int:
@@ -120,6 +137,7 @@ class Player(BasePlayer):
     # set la correspondance entre l'indice visible et le réel indice
     def init_real_index(self):
         index_map = create_index_map()
+        set_ordre_risque_ambiguite(self, index_map)
         for i in range(1, 9):
             setattr(self, f"real_index_{i}", index_map[i - 1])
 
@@ -177,7 +195,7 @@ class Player(BasePlayer):
         vars["chosen_decision"] = self.chosen_decision
         vars["invested"] = getattr(self, f"inv{self.real_chosen_decision}")
         vars["ball_color"] = bc
-        vars['initial_amount'] = C.ENDOWMENT
+        vars["initial_amount"] = C.ENDOWMENT
         vars["profit"] = self.profit
         vars["payoff"] = self.payoff
 
@@ -195,6 +213,22 @@ def create_index_map() -> list:
     random.shuffle(liste2)
 
     return liste1 + liste2
+
+
+# définit ordre_rg, ordre_ag etc...
+def set_ordre_risque_ambiguite(player: Player, index_map: list):
+    attr_names = [
+        "ordre_rg",
+        "ordre_ag",
+        "ordre_rp",
+        "ordre_ap",
+        "ordre_crg",
+        "ordre_cag",
+        "ordre_crp",
+        "ordre_cap",
+    ]
+    for attr, n in zip(attr_names, range(1, 9)):
+        setattr(player, attr, index_map.index(n) + 1)
 
 
 # logique d'affichage : vrai si décision 1 à 4, ou respecte les conditions pour 5 à 8, faux sinon
@@ -447,7 +481,7 @@ class InvestmentConfirm(Page):
 
 class InvestmentIntro1_4(Page):
     def vars_for_template(player: Player):
-        return {'ball_number_per_color': C.BALL_NUMBER // 2 } | getTemplate(player)
+        return {"ball_number_per_color": C.BALL_NUMBER // 2} | getTemplate(player)
 
 
 class InvestmentDecision1_4(Page):
