@@ -111,7 +111,7 @@ function sendTokens() {
   }
 
   amountInput.classList.remove("is-invalid");
-  liveSend({ amount_sent: amount });
+  liveSend({ amount_sent: amount, time_remaining: timeRemaining });
 
   document.getElementById("send_button").disabled = true;
   document.getElementById("sent_amount").textContent = amount;

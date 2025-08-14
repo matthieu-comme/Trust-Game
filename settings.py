@@ -42,19 +42,37 @@ SESSION_CONFIGS = [
         name="groupe_1",
         display_name="Groupe 1",
         num_demo_participants=PLAYERS_PER_GROUP,
-        app_sequence=["questionnaire", "risk_aversion", "trust_game", "results"],
+        app_sequence=[
+            "intro",
+            "questionnaire",
+            "risk_aversion",
+            "trust_game",
+            "results",
+        ],
     ),
     dict(
         name="groupe_2",
         display_name="Groupe 2",
         num_demo_participants=PLAYERS_PER_GROUP,
-        app_sequence=["risk_aversion", "questionnaire", "trust_game", "results"],
+        app_sequence=[
+            "intro",
+            "risk_aversion",
+            "questionnaire",
+            "trust_game",
+            "results",
+        ],
     ),
     dict(
         name="groupe_3",
         display_name="Groupe 3",
         num_demo_participants=PLAYERS_PER_GROUP,
-        app_sequence=["questionnaire", "trust_game", "risk_aversion", "results"],
+        app_sequence=[
+            "intro",
+            "questionnaire",
+            "trust_game",
+            "risk_aversion",
+            "results",
+        ],
     ),
 ]
 

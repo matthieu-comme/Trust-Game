@@ -35,6 +35,7 @@ class Subsession(BaseSubsession):
 class Group(BaseGroup):
     amount_sent = models.CurrencyField(min=0, max=C.ENDOWMENT)
     amount_sent_back = models.CurrencyField()
+    decision_time = models.IntegerField()  # temps qu'a pris A pour décider
     expire_time = models.FloatField()  # temps d'expiration du chat
 
     def set_payoffs(self):
@@ -50,6 +51,8 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
+    p_role = models.StringField()
+    partner_id = models.StringField()
     # Réponses des participants
     q1_b_receive = models.IntegerField(label="")
     q2_a_get_back = models.IntegerField(label="")
@@ -67,6 +70,13 @@ class Player(BasePlayer):
 
     gpt_behavior = models.StringField(initial=C.GPT_BEHAVIOR)
     has_cheap_talk = models.BooleanField(initial=C.HAS_CHEAP_TALK)
+
+
+def set_partner_id(player: Player):
+    partner = player.get_others_in_group()[0]
+    uid = partner.participant.code
+    id = str(partner.participant.id_in_session)
+    player.partner_id = uid if uid else id
 
 
 """
@@ -155,6 +165,10 @@ class Instructions(Page):
             "has cheap talk": player.has_cheap_talk,
         }
 
+    def before_next_page(player: Player, timeout_happened):
+        player.p_role = "A" if player.id_in_group == 1 else "B"
+        set_partner_id(player)
+
 
 # gérer les messages du chat entre joueurs
 def handle_chat_message(player: Player, data):
@@ -238,6 +252,7 @@ def handle_amount_sent(player: Player, data) -> dict:
     group: Group = player.group
     if 0 <= amount <= C.ENDOWMENT:
         group.amount_sent = amount
+        group.decision_time = C.CHAT_DURATION - int(data["time_remaining"])
         # Notifier les deux joueurs
         responses = {}
         for p in group.get_players():
