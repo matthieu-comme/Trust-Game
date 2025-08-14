@@ -3,12 +3,10 @@ from openai import OpenAI
 import json
 import random
 import time
+import os
 
 # récupère la clé openai
-with open("config.json") as f:
-    config = json.load(f)
-
-key = config["OPENAI_API_KEY"]
+key = os.environ.get("OPENAI_API_KEY")
 client = OpenAI(api_key=key)
 
 
