@@ -1,4 +1,8 @@
 from otree.api import *
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class C(BaseConstants):
@@ -6,7 +10,8 @@ class C(BaseConstants):
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
     NUM_APPS = 3
-    BASE_URL = "http://localhost:8000"
+    LOCAL_URL = "http://localhost:8000"
+    HEROKU_URL = "https://trust-game-ai-f55aa68b15d2.herokuapp.com"
     USERNAME = "admin"
     PASSWORD = "admin"
     # insérer le code du session-wide link, et non le code de la session
@@ -62,11 +67,16 @@ class Dispatch(Page):
     @staticmethod
     def vars_for_template(player: Player):
         code = get_code(player)
+        if os.getenv("IS_HEROKU", "False") == "True":
+            base_url = C.HEROKU_URL
+        else:
+            base_url = C.LOCAL_URL
+
         return {
             "player_vars": player.participant.vars,
             "group_number": player.group_number,
             "code": code,
-            "link": f'href="{C.BASE_URL}/join/{code}"',
+            "link": f'href="{base_url}/join/{code}"',
         }
 
 

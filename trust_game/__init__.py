@@ -1,9 +1,11 @@
 from otree.api import *
 from openai import OpenAI
-import json
 import random
 import time
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # récupère la clé openai
 key = os.environ.get("OPENAI_API_KEY")

@@ -1,4 +1,8 @@
 from os import environ
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 PLAYERS_PER_GROUP = 2  # le TG se joue à 2
 SESSION_CONFIGS = [
@@ -107,12 +111,14 @@ ROOMS = [
 ADMIN_USERNAME = "admin"
 # for security, best to set admin password in an environment variable
 ADMIN_PASSWORD = environ.get("OTREE_ADMIN_PASSWORD")
+AUTH_LEVEL = os.getenv("OTREE_AUTH_LEVEL", "STUDY")
+
 
 DEMO_PAGE_INTRO_HTML = """
 Here are some oTree games.
 """
 
-# DEBUG = False
+DEBUG = os.getenv("DEBUG", "True") == "True"
 
 SECRET_KEY = "9819358673787"
 LANGUAGE_CODE = "fr"
