@@ -196,8 +196,8 @@ class Player(BasePlayer):
         vars["invested"] = getattr(self, f"inv{self.real_chosen_decision}")
         vars["ball_color"] = bc
         vars["initial_amount"] = C.ENDOWMENT
-        vars["profit"] = self.profit
-        vars["payoff"] = self.payoff
+        vars["profit_risk_aversion"] = self.profit
+        vars["total_risk_aversion"] = self.payoff
 
 
 # ----- FONCTIONS -----
@@ -550,8 +550,8 @@ class Fin(Page):
             "initial_amount": C.ENDOWMENT,
             "invested": getattr(player, f"inv{player.real_chosen_decision}"),
             "ball_color": player.ball_color,
-            "profit": player.profit,
-            "payoff": player.payoff,
+            "profit_risk_aversion": player.profit,
+            "total_risk_aversion": player.payoff,
             "participant.payoff": player.participant.payoff,
         }
 

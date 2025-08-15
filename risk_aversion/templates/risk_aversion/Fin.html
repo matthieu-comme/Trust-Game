@@ -2,15 +2,7 @@
 
 {{ block content }}
 
-<p><strong>Résultats du tirage au sort:</strong></p>
-<ul>
-  <li>N° Décision : {{ chosen_decision }} <strong style="color: red">( en réalité {{ real_chosen_decision }} )</strong></li>
-  <li>Choix lors de cette décision : {{ invested }}</li>
-  <li>Boule tirée : {{ ball_color }}</li>
-  <li>Somme initiale : {{ initial_amount | to0 }}</li>
-  <li>Profit associé : {{ profit | to0 }}</li>
-  <li>Votre total de jetons: {{ initial_amount | to0 }} + {{ profit | to0 }} = {{ payoff | to0 }}</li>
-</ul>
+Cette étape est finie, cliquez sur suivant pour passer à la suite.
 
 {{ next_button }} 
 

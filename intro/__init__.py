@@ -11,6 +11,7 @@ class C(BaseConstants):
     PLAYERS_PER_GROUP = None
     NUM_ROUNDS = 1
     ORDRES_ETAPES = ["Ordre not found", "Q/A/TG", "A/Q/TG", "Q/TG/A"]
+    SHOW_UP_FEE = 5
 
 
 class Subsession(BaseSubsession):
@@ -40,6 +41,8 @@ def set_vars(player: Player):
 
     date = datetime.now().strftime("%d-%b-%y")
     player.date = date
+
+    player.participant.vars["show_up_fee"] = C.SHOW_UP_FEE
 
 
 # PAGES

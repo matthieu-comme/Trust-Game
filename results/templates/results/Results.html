@@ -2,14 +2,44 @@
 
 {{ block content }}
 
-<p><strong>Résultats du tirage au sort:</strong></p>
 <ul>
-  <li>N° Décision : {{ chosen_decision }}</strong></li>
-  <li>Choix lors de cette décision : {{ invested }}</li>
-  <li>Boule tirée : {{ ball_color }}</li>
-  <li>Somme initiale : {{ initial_amount | to0 }}</li>
-  <li>Profit associé : {{ profit | to0 }}</li>
-  <li>Votre total de jetons: {{ initial_amount | to0 }} + {{ profit | to0 }} = {{ payoff | to0 }}</li>
+  <li>Show-up fee : <strong>{{ show_up_fee | to0 }}</strong></li>
+  <li>
+    <p><strong>Résultats du tirage au sort:</strong></p>
+    <ul>
+      <li>N° Décision : {{ chosen_decision }}</strong></li>
+      <li>Somme investie : {{ invested }}</li>
+      <li>Boule tirée : {{ ball_color }}</li>
+      <li>Somme initiale : {{ initial_amount | to0 }}</li>
+      <li>Profit associé : {{ profit_risk_aversion | to0 }}</li>
+      <li>Total de jetons tirage au sort: {{ initial_amount | to0 }} + {{ profit_risk_aversion | to0 }} = <strong>{{ gain_risk_aversion | to0 }}</strong></li>
+    </ul>
+  </li>
+  {{ if tg_role }}
+  <li>
+    <p>Jeu avec le partenaire:</p>
+      {{ if tg_role == "A" }}
+        <p>
+          Vous aviez {{ tg_endowment }} jetons, vous en avez envoyé {{ tg_sent }} à votre partenaire.
+          Cette somme a été multipliée par 3 en lui parvenant. Il vous en a retourné {{ tg_sent_back }}.
+        </p>
+        <p>Vos gains pour cette étape : {{ tg_endowment }} - {{ tg_sent }} + {{ tg_sent_back }} = <strong>{{ tg_gain | to0  }}</strong></p>
+      {{ else }}
+        <p>
+          Votre partenaire vous a envoyé {{ tg_sent }}. Cette somme a été multipliée par {{ tg_multiplier }} en vous parvenant.
+          Vous lui avez retourné {{ tg_sent_back }}.
+        </p>
+        <p>Vos gains pour cette étape : {{ tg_multiplier }} x {{ tg_sent }} - {{ tg_sent_back }} = <strong>{{ tg_gain | to0 }}</strong> </p>
+      {{ endif }}
+    
+  </li>
+  {{ endif }}
+  <li>
+    <p>
+      Votre gain total dans cette expérimentation : {{ show_up_fee | to0 }} + {{ gain_risk_aversion | to0 }} + {{ tg_gain | to0 }} = <strong>{{ gain_total | to0 }}</strong> </li>
+      En appliquant le taux de change, cela fait <strong>{{ converted_gain }}</strong> €.
+    </p>
+    <p>Notez-bien votre code: <strong>{{ player.participant.code }}</strong></p>
 </ul>
     {{ next_button }}
 {{ endblock }}

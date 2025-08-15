@@ -51,7 +51,7 @@ class Group(BaseGroup):
 
 
 class Player(BasePlayer):
-    p_role = models.StringField()
+    tg_role = models.StringField()
     partner_id = models.StringField()
     error_count = models.IntegerField(initial=0)  # nombre d'erreurs au quiz
     # Réponses des participants
@@ -71,6 +71,20 @@ class Player(BasePlayer):
 
     gpt_behavior = models.StringField(initial=C.GPT_BEHAVIOR)
     has_cheap_talk = models.BooleanField(initial=C.HAS_CHEAP_TALK)
+
+
+def set_participant_vars(player: Player):
+    player.tg_role = "A" if player.id_in_group == 1 else "B"
+    player.participant.vars["tg_role"] = player.tg_role
+    player.participant.vars["tg_endowment"] = C.ENDOWMENT
+
+    group: Group = player.group
+    sent = int(group.amount_sent)
+    tripled = sent * C.MULTIPLIER
+    sent_back = int(group.amount_sent_back)
+    player.participant.vars["tg_sent"] = sent
+    player.participant.vars["tg_multiplier"] = C.MULTIPLIER
+    player.participant.vars["tg_sent_back"] = sent_back
 
 
 def set_partner_id(player: Player):
@@ -173,7 +187,6 @@ class Instructions(Page):
         }
 
     def before_next_page(player: Player, timeout_happened):
-        player.p_role = "A" if player.id_in_group == 1 else "B"
         set_partner_id(player)
 
 
@@ -381,10 +394,13 @@ class Results(Page):
             is_test_round=(player.round_number == 1),
         )
 
+    def before_next_page(player: Player, timeout_happened):
+        set_participant_vars(player)
+
 
 page_sequence = [
-    #Instructions,
-    #QuizExample1,
+    Instructions,
+    QuizExample1,
     SyncWaitPage,
     GamePlay,
     Results,
