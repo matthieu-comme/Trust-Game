@@ -18,14 +18,14 @@ class C(BaseConstants):
     NUM_ROUNDS = 1
     ENDOWMENT = 10  # somme initiale du joueur A
     MULTIPLIER = 3
-    CHAT_DURATION = 120  # Temps de conversation en secondes
+    CHAT_DURATION = 300  # Temps de conversation en secondes
     USER_PREFIX = "<strong>Joueur:</strong> "  # nom du joueur affiché avant son message dans le chat
     BOT_PREFIX = "<strong>GPT:</strong> "  # pareil pour gpt
     CHAT_SEPARATOR = "<br>"  # séparateur entre 2 messages
     NO_GPT_BEHAVIOR = "Non"
     # Modifier les deux paramètres suivants pour obtenir le traitement souhaité
-    HAS_CHEAP_TALK = True
-    GPT_BEHAVIOR = "Stratège"  # = NO_GPT_BEHAVIOR pour désactiver le chat avec IA
+    HAS_CHEAP_TALK = os.environ.get("HAS_CHEAP_TALK") == "True"
+    GPT_BEHAVIOR = os.environ.get("GPT_BEHAVIOR")
 
 
 class Subsession(BaseSubsession):
@@ -35,7 +35,7 @@ class Subsession(BaseSubsession):
 class Group(BaseGroup):
     amount_sent = models.CurrencyField(min=0, max=C.ENDOWMENT)
     amount_sent_back = models.CurrencyField()
-    decision_time = models.IntegerField()  # temps qu'a pris A pour décider
+    talk_time = models.IntegerField()  # temps réel de conversation
     expire_time = models.FloatField()  # temps d'expiration du chat
 
     def set_payoffs(self):
@@ -53,6 +53,7 @@ class Group(BaseGroup):
 class Player(BasePlayer):
     p_role = models.StringField()
     partner_id = models.StringField()
+    error_count = models.IntegerField(initial=0)  # nombre d'erreurs au quiz
     # Réponses des participants
     q1_b_receive = models.IntegerField(label="")
     q2_a_get_back = models.IntegerField(label="")
@@ -130,21 +131,27 @@ class BaseQuiz(Page):
         correct_q1 = player.x * C.MULTIPLIER
 
         if values["q1_b_receive"] != correct_q1:
+            player.error_count += 1
             errors["q1_b_receive"] = (
                 f"Le joueur B reçoit {player.x} × {C.MULTIPLIER} = {correct_q1} jetons."
             )
 
         if values["q2_a_get_back"] != player.z:
+            player.error_count += 1
             errors["q2_a_get_back"] = (
                 f"Le joueur A reçoit ce que B renvoie : {player.z} jetons."
             )
 
         if values["q3_a_final"] != 8:
+            player.error_count += 1
             errors["q3_a_final"] = "Revoir le calcul : 10 - 4 + 2 = 8 jetons."
+
         if values["q3_b_final"] != 10:
+            player.error_count += 1
             errors["q3_b_final"] = "Revoir le calcul : 12 - 2 = 10 jetons."
 
         if values["q4_true_false"] != "Faux":
+            player.error_count += 1
             errors["q4_true_false"] = (
                 "C'est faux : les jetons renvoyés par B ne sont pas triplés."
             )
@@ -252,7 +259,7 @@ def handle_amount_sent(player: Player, data) -> dict:
     group: Group = player.group
     if 0 <= amount <= C.ENDOWMENT:
         group.amount_sent = amount
-        group.decision_time = C.CHAT_DURATION - int(data["time_remaining"])
+        group.talk_time = int(C.CHAT_DURATION - (group.expire_time - time.time()))
         # Notifier les deux joueurs
         responses = {}
         for p in group.get_players():
@@ -376,8 +383,8 @@ class Results(Page):
 
 
 page_sequence = [
-    Instructions,
-    QuizExample1,
+    #Instructions,
+    #QuizExample1,
     SyncWaitPage,
     GamePlay,
     Results,

@@ -6,9 +6,13 @@ Jeu de Confiance {% else %} Joueur B - Jeu de Confiance {% endif %} {{ endblock
   <div class="row">
     <!-- Section chat avec timer -->
     <div class="col-md-12 mb-4">
+
+      {{ if has_chat_gpt or player.has_cheap_talk  }}
       <h4 id="time">
         <span id="time_remaining">{{ C.CHAT_DURATION }}</span>s restantes
       </h4>
+      {{ endif }}
+
       <div
         id="chat-container"
         style="display: flex; justify-content: space-between"

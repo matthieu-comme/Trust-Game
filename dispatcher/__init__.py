@@ -15,9 +15,9 @@ class C(BaseConstants):
     USERNAME = "admin"
     PASSWORD = "admin"
     # insérer le code du session-wide link, et non le code de la session
-    CODE_GROUPE_1 = "zanemofo"
-    CODE_GROUPE_2 = "muzuvuge"
-    CODE_GROUPE_3 = "pivijeno"
+    CODE_GROUPE_1 = os.environ.get("CODE_GROUPE_1")
+    CODE_GROUPE_2 = os.environ.get("CODE_GROUPE_2")
+    CODE_GROUPE_3 = os.environ.get("CODE_GROUPE_3")
 
 
 class Subsession(BaseSubsession):

@@ -16,6 +16,7 @@ class C(BaseConstants):
     NUM_ROUNDS = 1
     USER_PREFIX = "Joueur: "  # nom du joueur affiché avant son message dans le chat
     BOT_PREFIX = "GPT: "  # pareil pour gpt
+    GPT_BEHAVIOR = os.environ.get("GPT_BEHAVIOR")
 
 
 class Subsession(BaseSubsession):
@@ -28,7 +29,7 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     gpt_history = models.LongStringField(initial="")  # texte concaténé
-    gpt_behavior = models.StringField(initial="labrador")  # comportement du bot
+    gpt_behavior = models.StringField(initial=C.GPT_BEHAVIOR)  # comportement du bot
 
 
 def chat_with_gpt(player: Player, data):
